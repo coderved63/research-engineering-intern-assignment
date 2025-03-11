@@ -19,13 +19,20 @@ In the long run, this research intends to accomplish the following objectives:
 
 3. **Build and Deploy a Dashboard**: Develop and (ideally) host an interactive dashboard to showcase your analysis.
 
+## Examples of "How to Tell a Story with Data"
+
+There are some hosted web demos (note that some are blog posts, but they include graphs that we would want you to develop in an interactive dashboard) that **tell a story** with data that you should look into. We do not expect you to replicate or copy any of these but we do want you to understand the "tell us a story with data" goal of this assignment better by looking at these:
+1. [Fabio Gieglietto's TikTok Coordinated Behavior Report](https://fabiogiglietto.github.io/tiktok_csbn/tt_viz.html)
+2. [Integrity Institute's Misinformation Amplification Dashboard](https://integrityinstitute.org/blog/misinformation-amplification-tracking-dashboard)
+3. [News Literacy Project Misinformation Dashboard](https://misinfodashboard.newslit.org/)
+4. [Tableau examples (note: we don't use Tableau, and expect you to use Python or Javascript for this assignment, but these are interesting examples for inspiration)](https://public.tableau.com/app/search/vizzes/misinformation)
 
 ## Rubric for Evaluation
 Take a look at <a href="https://parrot.simppl.org/">parrot</a> that we have previously built as a visualization platform for Twitter data (it does not have search integrations though it is a good example of a solution other than that). Below is the rubric we will use for your evaluation, provided as a checklist for you to evaluate your own assignment before you submit it to us. 
 
 1. **IMPORTANT** Is the solution well-documented such that it is easy to understand its usage?
   
-2. **IMPORTANT** Is the solution hosted with a neatly designed frontend?
+2. **IMPORTANT** Is the solution hosted (on a publicly accessible web dashboard) with a neatly designed frontend?
    
 3. **IMPORTANT** Does the solution visualize summary statistics for the results? For example:
 
@@ -51,7 +58,7 @@ Take a look at <a href="https://parrot.simppl.org/">parrot</a> that we have prev
    
    &emsp; f. Semantic search after retrieving all posts matching a URL so that the retrieved results can be queried beyond keyword matching.
    
-**Bonus** If you host your Jupyter Notebook or JS dashboard, we consider it a significant improvement over applicants who haven’t hosted their solution.
+As a reminder, we expect you to host your Jupyter Notebook or JS dashboard on a publicly accessible website.
 
 
 ### Link to the dataset 
@@ -92,9 +99,9 @@ These instructions outline how to use GitHub for this assignment.  Please follow
 
 Please ensure you include:
 
-1. A detailed README file (with screenshots of your solution, a _hosted_ web platform).
+1. A detailed README file (with screenshots of your solution, a URL to your publicly accessible _hosted_ web platform).
 2. A text-based explanation of your code and thought process underlying system design. 
-3. A link to a video recording of your dashboard hosted on YouTube or Google Drive.
+3. A link to a video recording of your dashboard hosted on YouTube or Google Drive. You can talk and explain your idea as you walk us through the platform.
 
 Both of these last two make it easier for us to run your code and evaluate the assignment.
 
