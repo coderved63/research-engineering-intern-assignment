@@ -17,9 +17,9 @@ In the long run, this research intends to accomplish the following objectives:
 
 2. **Apply AI/ML**: Use LLMs and machine learning to generate metrics and enhance your analysis.
 
-3. **Build and Deploy a Dashboard**: Develop and (ideally) host an interactive dashboard to showcase your analysis.
+3. **Build and Deploy an Investigative Reporting Dashboard**: Develop and host an interactive dashboard to showcase your analysis. You should be able to query the dashboard to generate meaningful insights.
 
-## Examples of "How to Tell a Story with Data"
+## Examples of "How to Tell a Story with Data" (please spend time on this so you understand the assignment goals)
 
 There are some hosted web demos (note that some are blog posts, but they include graphs that we would want you to develop in an interactive dashboard) that **tell a story** with data that you should look into. We do not expect you to replicate or copy any of these but we do want you to understand the "tell us a story with data" goal of this assignment better by looking at these:
 1. [Fabio Gieglietto's TikTok Coordinated Behavior Report](https://fabiogiglietto.github.io/tiktok_csbn/tt_viz.html)
@@ -43,14 +43,19 @@ Take a look at <a href="https://parrot.simppl.org/">parrot</a> that we have prev
   &emsp; c. Pie chart of communities (or accounts) on the social media platform that are key contributors to a set of results
   
   &emsp; d. Network visualization of accounts that have shared a particular keyword, hashtag, or URL using additional data they may have shared
-  
-4. Unique features (optional, but here are some creative and useful features past applicants have built that resulted in successful outcomes):
+
+4. **IMPORTANT** Does the solution offer interactive and multimodal querying that allows the user to generate insights from the data?
+
+   a. Chatbot to query the data and answer questions that the user inputs about the trends for particular topics, themes, narratives, and news articles.
+   b. Multimodal analysis to showcase how you might be able to better study and present the trends in the content of the images, audio, or video within the dataset. 
+
+6. Unique features (optional, but here are some creative and useful features past applicants have built that resulted in successful outcomes):
 
    &emsp; a. Topic models embedding all the content of results using Tensorflow projector (free, basic), Datamapplot (free, advanced), or Nomic (paid) as a platform to visualize the semantic map of the posts.
    
    &emsp; b. GenAI summaries of the time-series plots for non-technical audiences to understand the trends better.
    
-   &emsp; c. Chatbot to query the data and answer questions that the user inputs about the trends for particular topics, themes, narratives, and news articles.
+   &emsp; c. Chatbot to refine and suggest follow-up queries to the user's original query.
    
    &emsp; d. Connecting offline events from the news articles with the online sharing of posts on social media for specific searches (for example using Wikipedia to find key events in the Russian invasion of Ukraine and map them  to the online narratives that are shared – though this is somewhat manual and not easy to automate, but extremely useful nevertheless).
    
