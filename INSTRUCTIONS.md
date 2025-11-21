@@ -99,7 +99,6 @@ These instructions outline how to use GitHub for this assignment.  Please follow
 
 7. Please notify us of your submission by emailing simppl.collabs@gmail.com with the subject line "Submitting Research Engineer Intern Assignment for SimPPL".
 
-
 ### Submission Requirements
 
 Please ensure you include:
@@ -109,6 +108,13 @@ Please ensure you include:
 3. A link to a video recording of your dashboard hosted on YouTube or Google Drive. You can talk and explain your idea as you walk us through the platform.
 
 Both of these last two make it easier for us to run your code and evaluate the assignment.
+
+### AI Usage Policy
+
+We're an AI-first company and we certainly appreciate the thoughtful and human-verified use of coding copilots to write code. If you do use AI to write any code, we would like you to commit a file called <yourname>-prompts.md within your repository so we understand how you prompt AI models. Please separate your prompts by numbering them so we can also follow how you progressively prompted the models to write any parts of your codebase and what bugs you found and fixed in the process. Yes, we do evaluate your prompt engineering capabilities and yes it is a plus if you're good at prompt and [context engineering](https://www.philschmid.de/context-engineering). Without visibility into the prompts you engineer, we cannot assess your ability to use AI copilots for programming. In that case you lose out on a few brownie points you would otherwise get from our team for being smart about AI use in your work.
+
+We have seen enough horrendous code written by AI and been forced to part with a teammate who refused to verify AI generated code and kept breaking our codebase with their pull requests. So this is a real problem that we are tackling. We also have teammates who were hesitant to use AI and then we had to coach them through the process of learning to write code with AI which was helpful to them. The institution of this policy is so that we don't end up hiring vibe coders who do not care about the quality and only care about the volume and pace of production of output--and yet manage to hire smart engineers who can leverage the cutting edge tools at their disposal to write great code. 
+
 
 ### Resources
 1. [OSINT Tools](https://start.me/p/0Pqbdg/osint-500-tools)
@@ -121,7 +127,7 @@ Both of these last two make it easier for us to run your code and evaluate the a
 8. [Cloudfare Workers](https://workers.cloudflare.com/)
 9. [Apache Superset](https://github.com/apache/superset)
 10. [Terraform](https://www.hashicorp.com/en/products/terraform)
-    
+
 #### Note
 
 Focus on the analysis you are presenting and the story you are telling us through it. A well-designed and scalable system is more important than a complex one with a ton of features. Consider using innovative technologies in a user-friendly manner to create unique features for your platform such as AI-generated summaries that are adaptable to the data a user searches for, using your platform.
