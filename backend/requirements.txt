@@ -1,0 +1,32 @@
+# Web framework
+flask==3.1.1
+flask-cors==5.0.1
+gunicorn==23.0.0
+
+# Data processing
+pandas==2.2.3
+numpy==2.2.6
+
+# Database
+# sqlite3 is built into Python
+
+# ML / Embeddings
+sentence-transformers==4.1.0
+scikit-learn==1.6.1
+umap-learn==0.5.7
+
+# Network analysis
+networkx==3.4.2
+python-louvain==0.16
+
+# LLM
+google-generativeai==0.8.5
+
+# Visualization
+datamapplot==0.4.5
+
+# NLP utilities
+langdetect==1.0.9
+
+# TF-IDF for cluster labeling
+# (included in scikit-learn)
