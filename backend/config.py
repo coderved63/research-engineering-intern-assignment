@@ -16,7 +16,7 @@ DATA_JSONL = os.path.join(os.path.dirname(BASE_DIR), 'data.jsonl')
 
 # LLM Configuration
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
+GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemma-3-27b-it')
 
 # Embedding model
 EMBEDDING_MODEL = 'all-MiniLM-L6-v2'
