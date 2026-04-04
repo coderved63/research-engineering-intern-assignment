@@ -63,6 +63,11 @@ def create_app():
     app.register_blueprint(clusters_bp, url_prefix='/api/v1')
     app.register_blueprint(overview_bp, url_prefix='/api/v1')
 
+    # Serve static files (datamapplot HTML etc.)
+    @app.route('/static/<path:filename>')
+    def serve_static(filename):
+        return send_from_directory(STATIC_DIR, filename)
+
     # Serve React build (production)
     frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'frontend', 'dist')
     if os.path.exists(frontend_dist):
