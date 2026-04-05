@@ -69,9 +69,15 @@ def get_clusters():
                 del clusters[cid]['post_ids']
 
             conn.close()
+
+            cluster_list = list(clusters.values())
+            from services.llm_service import generate_cluster_summary
+            summary = generate_cluster_summary(cluster_list, k)
+
             result = {
-                'clusters': list(clusters.values()),
+                'clusters': cluster_list,
                 'k': k,
+                'summary': summary,
             }
             if was_clamped:
                 result['warning'] = f'Requested k={original_k} was clamped to {k} (valid range: {MIN_K}-{MAX_K})'

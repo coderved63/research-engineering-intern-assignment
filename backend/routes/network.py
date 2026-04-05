@@ -33,6 +33,8 @@ def get_graph():
     graph_data = current_app.config['graph_data']
 
     if min_degree <= 1:
+        from services.llm_service import generate_network_summary
+        graph_data['summary'] = generate_network_summary(graph_data.get('stats', {}))
         return jsonify(graph_data)
 
     # Filter nodes by minimum degree

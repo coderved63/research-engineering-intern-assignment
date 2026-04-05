@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getNetworkGraph, removeNetworkNode } from '../services/api'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import AISummary from '../components/common/AISummary'
 import ForceGraph2D from 'react-force-graph-2d'
 
 const COMMUNITY_COLORS = [
@@ -17,6 +18,7 @@ export default function Network() {
   const [removalImpact, setRemovalImpact] = useState(null)
   const [loading, setLoading] = useState(true)
   const [removing, setRemoving] = useState(false)
+  const [summary, setSummary] = useState('')
   const [containerWidth, setContainerWidth] = useState(800)
   const graphRef = useRef()
   const containerRef = useRef()
@@ -41,6 +43,7 @@ export default function Network() {
         const res = await getNetworkGraph({ min_degree: minDegree })
         const data = res.data
         setStats(data.stats)
+        setSummary(data.summary || '')
 
         const nodes = data.nodes.map(n => ({
           id: n.id,
@@ -216,6 +219,7 @@ export default function Network() {
           <p className="text-xs text-gray-400 mt-2">
             Node size = degree (connections). Click a node to inspect. Scroll to zoom, drag to pan.
           </p>
+          <AISummary text={summary} />
         </div>
 
         {/* Side Panel */}

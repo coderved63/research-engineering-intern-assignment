@@ -2,42 +2,76 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
 #root {
   min-height: 100vh;
 }
 
+/* Grid pattern background */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(200, 200, 200, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200, 200, 200, 0.15) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.dark-mode .grid-bg {
+  background-image:
+    linear-gradient(rgba(100, 100, 120, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 100, 120, 0.2) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+h1 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+h2, h3, h4, h5, h6 {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
 /* Dark mode overrides for glassmorphic cards */
 .dark-mode .bg-white\/70 {
-  background: rgba(30, 30, 45, 0.7) !important;
-  border-color: rgba(99, 102, 241, 0.15) !important;
+  background: rgba(20, 20, 25, 0.8) !important;
+  border-color: rgba(60, 60, 70, 0.4) !important;
 }
 
 .dark-mode .bg-indigo-50\/50 {
-  background: rgba(49, 46, 89, 0.5) !important;
-  border-color: rgba(99, 102, 241, 0.2) !important;
+  background: rgba(40, 30, 15, 0.5) !important;
+  border-color: rgba(245, 158, 11, 0.15) !important;
 }
 
 .dark-mode .bg-indigo-50\/70 {
-  background: rgba(49, 46, 89, 0.5) !important;
-  border-color: rgba(99, 102, 241, 0.2) !important;
+  background: rgba(40, 30, 15, 0.5) !important;
+  border-color: rgba(245, 158, 11, 0.15) !important;
 }
 
 .dark-mode .bg-white\/60 {
-  background: rgba(30, 30, 50, 0.6) !important;
+  background: rgba(20, 20, 25, 0.6) !important;
+}
+
+.dark-mode .bg-white\/10 {
+  background: rgba(30, 30, 35, 0.6) !important;
 }
 
 .dark-mode .bg-blue-50\/70 {
-  background: rgba(30, 40, 70, 0.5) !important;
+  background: rgba(20, 25, 40, 0.5) !important;
   border-color: rgba(59, 130, 246, 0.2) !important;
 }
 
 .dark-mode .bg-amber-50\/70 {
-  background: rgba(60, 50, 30, 0.5) !important;
+  background: rgba(40, 30, 15, 0.5) !important;
   border-color: rgba(245, 158, 11, 0.2) !important;
 }
 
@@ -75,25 +109,25 @@ body {
 }
 
 .dark-mode .border-gray-200 {
-  border-color: rgba(99, 102, 241, 0.15) !important;
+  border-color: rgba(60, 60, 70, 0.4) !important;
 }
 
 .dark-mode .border-gray-100 {
-  border-color: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(60, 60, 70, 0.3) !important;
 }
 
 .dark-mode input, .dark-mode select {
-  background: rgba(30, 30, 50, 0.8) !important;
+  background: rgba(20, 20, 25, 0.8) !important;
   color: #e2e8f0 !important;
-  border-color: rgba(99, 102, 241, 0.2) !important;
+  border-color: rgba(60, 60, 70, 0.4) !important;
 }
 
 .dark-mode .bg-gray-100 {
-  background: rgba(55, 55, 75, 0.6) !important;
+  background: rgba(30, 30, 35, 0.6) !important;
 }
 
 .dark-mode .bg-gray-50 {
-  background: rgba(40, 40, 60, 0.6) !important;
+  background: rgba(25, 25, 30, 0.6) !important;
 }
 
 .dark-mode table {
@@ -105,11 +139,11 @@ body {
 }
 
 .dark-mode .recharts-cartesian-grid line {
-  stroke: rgba(99, 102, 241, 0.1) !important;
+  stroke: rgba(60, 60, 70, 0.2) !important;
 }
 
 .dark-mode .recharts-tooltip-wrapper .recharts-default-tooltip {
-  background: rgba(30, 30, 50, 0.95) !important;
-  border-color: rgba(99, 102, 241, 0.2) !important;
+  background: rgba(20, 20, 25, 0.95) !important;
+  border-color: rgba(60, 60, 70, 0.4) !important;
   color: #e2e8f0 !important;
 }

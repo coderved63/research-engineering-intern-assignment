@@ -205,19 +205,35 @@ Return ONLY the 3 questions, one per line, no numbering or bullets."""
 
 def generate_overview_summary(stats):
     """Generate an executive summary for the overview page."""
-    prompt = f"""You are writing a brief executive summary for a political discourse analysis dashboard.
+    prompt = f"""Write a plain-text summary (NO markdown, NO headers, NO #, NO bullet points with *) for a political discourse dashboard.
 
 Dataset: {stats['total_posts']} Reddit posts from {stats['total_authors']} authors
 Subreddits: {', '.join([f"r/{s['name']} ({s['count']})" for s in stats['subreddits']])}
 Date range: {stats['date_range']['start']} to {stats['date_range']['end']}
-Top news sources shared: {', '.join([d['domain'] for d in stats['top_domains'][:5]])}
-Network: {stats['network_stats']['num_nodes']} connected authors, {stats['network_stats']['num_components']} components
+Top news sources: {', '.join([f"{d['domain']} ({d['count']} shares)" for d in stats['top_domains'][:5]])}
+Network: {stats['network_stats']['num_nodes']} connected authors, {stats['network_stats']['num_components']} separate components
 
-Write a 3-4 sentence executive summary that a journalist could use. Highlight what makes this dataset interesting — the political diversity, the time period (covering the 2024 US election and 2025 transition of power), and what kinds of analysis are possible. Be concise and analytical, not promotional."""
+Write exactly 3 short paragraphs, plain text only:
+1. What this dataset is and why the time period matters (2024 election + 2025 transition)
+2. One specific insight: which communities share which news sources (give exact names and numbers)
+3. One specific insight: what the fragmented network (72 components) tells us about cross-community dialogue
 
-    result = _call_llm(prompt, max_tokens=250)
+Do NOT use any markdown formatting. Do NOT start with "Executive Summary" or any title. Just write the paragraphs directly."""
+
+    result = _call_llm(prompt, max_tokens=300)
     if result:
-        return result
+        # Strip any markdown the LLM might still add
+        cleaned = result.strip()
+        for prefix in ['## Executive Summary', '# Executive Summary', '## Summary', '# Summary',
+                       'Executive Summary:', 'Summary:', '**Executive Summary**']:
+            if cleaned.startswith(prefix):
+                cleaned = cleaned[len(prefix):].strip()
+        # Remove markdown headers
+        import re
+        cleaned = re.sub(r'^#{1,4}\s+.*$', '', cleaned, flags=re.MULTILINE).strip()
+        # Remove bold markers
+        cleaned = cleaned.replace('**', '')
+        return cleaned
 
     return (
         f"This dataset captures {stats['total_posts']} posts from {stats['total_authors']} authors "
@@ -225,6 +241,45 @@ Write a 3-4 sentence executive summary that a journalist could use. Highlight wh
         f"The period covers the 2024 US presidential election through the first weeks of the new administration. "
         f"Top shared news sources include {', '.join([d['domain'] for d in stats['top_domains'][:3]])}."
     )
+
+
+def generate_cluster_summary(clusters, k):
+    """Generate a summary of the clustering results."""
+    cluster_desc = "\n".join([
+        f"- Cluster {c['id']} ({c['size']} posts): {c['label']}"
+        for c in sorted(clusters, key=lambda x: -x['size'])[:10]
+    ])
+
+    prompt = f"""Write a plain-text summary (NO markdown, NO headers, NO #) analyzing these topic clusters from Reddit political discourse data (8,799 posts, 10 subreddits, Jul 2024 - Feb 2025).
+
+{k} clusters were created using KMeans. Here are the largest ones:
+{cluster_desc}
+
+Write 2-3 sentences explaining: what are the dominant topics, which topics overlap or are surprising, and what this tells us about what Reddit was discussing during this period. Use specific cluster names and numbers. Do NOT use markdown formatting."""
+
+    result = _call_llm(prompt, max_tokens=200)
+    if result:
+        import re
+        cleaned = re.sub(r'^#{1,4}\s+.*$', '', result, flags=re.MULTILINE).strip()
+        return cleaned.replace('**', '')
+    return None
+
+
+def generate_network_summary(stats):
+    """Generate a summary of the network analysis."""
+    prompt = f"""Write a plain-text summary (NO markdown, NO headers, NO #) analyzing this author interaction network from Reddit political discourse data.
+
+Network stats: {stats['num_nodes']} connected authors, {stats['num_edges']} edges, {stats['num_components']} disconnected components, {stats.get('num_communities', 'unknown')} communities detected.
+Density: {stats.get('density', 'unknown')}
+
+Write 2-3 sentences explaining: what does the high number of components mean (fragmentation), what does the density tell us about how connected authors are, and what this implies about cross-community interaction on Reddit. Use specific numbers. Do NOT use markdown formatting."""
+
+    result = _call_llm(prompt, max_tokens=200)
+    if result:
+        import re
+        cleaned = re.sub(r'^#{1,4}\s+.*$', '', result, flags=re.MULTILINE).strip()
+        return cleaned.replace('**', '')
+    return None
 
 
 def answer_chart_question(question, data_context):

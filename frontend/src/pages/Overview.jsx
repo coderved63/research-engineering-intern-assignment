@@ -76,7 +76,7 @@ export default function Overview() {
         <h1 className="text-3xl font-bold text-gray-900">
           Political Discourse on Reddit
         </h1>
-        <p className="text-gray-500 mt-2 max-w-3xl">
+        <p className="text-gray-500 mt-2">
           How do 10 politically diverse Reddit communities process the same political events — and who bridges the divides?
           This dataset captures {stats.total_posts.toLocaleString()} posts from {stats.total_authors.toLocaleString()} authors
           across the political spectrum (Jul 2024 — Feb 2025), covering the US election through the first weeks of the new administration.
@@ -89,41 +89,41 @@ export default function Overview() {
         <summary className="px-6 py-4 cursor-pointer text-sm font-semibold text-gray-900 hover:text-indigo-700 select-none">
           About This Analysis — Methodology & Approach
         </summary>
-        <div className="px-6 pb-5 text-sm text-gray-600 space-y-3 border-t border-gray-100 pt-4">
-          <p>
+        <div className="px-6 pb-6 text-gray-600 space-y-4 border-t border-gray-100 pt-5">
+          <p className="text-sm leading-relaxed">
             This dashboard investigates how political narratives spread across Reddit's ecosystem during the 2024 US election
-            and 2025 presidential transition. Inspired by SimPPL's Parrot platform, it combines <strong>linguistic analysis</strong> (NLP)
-            with <strong>network analysis</strong> to trace how information flows between communities with different political orientations.
+            and 2025 presidential transition. Inspired by SimPPL's Parrot platform, it combines <strong className="text-gray-800">linguistic analysis</strong> (NLP)
+            with <strong className="text-gray-800">network analysis</strong> to trace how information flows between communities with different political orientations.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium text-gray-800 mb-1">Data Source</h4>
-              <p className="text-xs text-gray-500">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="bg-white/10 rounded-lg p-4 border border-gray-200/20">
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Data Source</h4>
+              <p className="text-sm text-gray-600 leading-relaxed">
                 8,799 Reddit posts from 10 subreddits spanning the political spectrum: r/Anarchism, r/socialism, r/democrats,
                 r/Liberal, r/politics, r/PoliticalDiscussion, r/neoliberal, r/worldpolitics, r/Conservative, and r/Republican.
                 Each post includes title, body text, author, score, comments, and timestamps (July 23, 2024 — February 18, 2025).
               </p>
             </div>
-            <div>
-              <h4 className="font-medium text-gray-800 mb-1">NLP Pipeline</h4>
-              <p className="text-xs text-gray-500">
+            <div className="bg-white/10 rounded-lg p-4 border border-gray-200/20">
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm">NLP Pipeline</h4>
+              <p className="text-sm text-gray-600 leading-relaxed">
                 Posts are encoded into 384-dimensional sentence embeddings using all-MiniLM-L6-v2 (sentence-transformers).
                 These embeddings power semantic search (cosine similarity), topic clustering (KMeans), and the 2D UMAP projection
                 for embedding visualization (Datamapplot).
               </p>
             </div>
-            <div>
-              <h4 className="font-medium text-gray-800 mb-1">Network Construction</h4>
-              <p className="text-xs text-gray-500">
+            <div className="bg-white/10 rounded-lg p-4 border border-gray-200/20">
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Network Construction</h4>
+              <p className="text-sm text-gray-600 leading-relaxed">
                 The author interaction network is built from three signal types: crosspost relationships (who crossposted from whom),
                 shared URL co-sharing (authors who independently shared the same external link), and co-subreddit activity
                 (authors active in 2+ of the same communities). We compute PageRank, betweenness centrality, and Louvain community detection.
                 The [deleted] meta-author is excluded to prevent false super-connections across 9 subreddits.
               </p>
             </div>
-            <div>
-              <h4 className="font-medium text-gray-800 mb-1">AI Integration</h4>
-              <p className="text-xs text-gray-500">
+            <div className="bg-white/10 rounded-lg p-4 border border-gray-200/20">
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm">AI Integration</h4>
+              <p className="text-sm text-gray-600 leading-relaxed">
                 Dynamic plain-language summaries beneath charts are generated by Gemma 3 27B (Google AI) based on the actual data
                 returned by each query — not hardcoded. The semantic search chatbot uses the same LLM for conversational responses
                 and follow-up query suggestions. Non-English queries are automatically detected and translated before searching.

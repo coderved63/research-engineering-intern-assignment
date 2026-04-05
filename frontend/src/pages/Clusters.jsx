@@ -25,6 +25,7 @@ export default function Clusters() {
   const [debouncedK, setDebouncedK] = useState(8)
   const [clusters, setClusters] = useState([])
   const [expandedCluster, setExpandedCluster] = useState(null)
+  const [summary, setSummary] = useState('')
   const [warning, setWarning] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -40,6 +41,7 @@ export default function Clusters() {
       try {
         const res = await getClusters({ k: debouncedK })
         setClusters(res.data.clusters || [])
+        setSummary(res.data.summary || '')
         setWarning(res.data.warning || null)
       } catch (err) {
         console.error(err)
@@ -121,6 +123,7 @@ export default function Clusters() {
               <p className="text-xs text-gray-400 text-center mt-1">
                 Click a segment to expand that cluster · Hover for details
               </p>
+              <AISummary text={summary} />
             </div>
           </div>
 
