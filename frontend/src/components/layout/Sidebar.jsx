@@ -5,7 +5,7 @@ const navItems = [
   { path: '/timeseries', label: 'Time Series', icon: '📈' },
   { path: '/network', label: 'Network', icon: '🔗' },
   { path: '/clusters', label: 'Topics', icon: '🧩' },
-  { path: '/search', label: 'Search', icon: '🔍' },
+  { path: '/search', label: 'SearchAI', icon: '🤖' },
   { path: '/embeddings', label: 'Embeddings', icon: '🗺️' },
 ]
 

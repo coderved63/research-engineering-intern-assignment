@@ -211,15 +211,17 @@ Write a 3-4 sentence executive summary that a journalist could use. Highlight wh
 
 def translate_query(query, source_lang):
     """Translate a non-English query to English."""
-    prompt = f"""Translate the following text from {source_lang} to English. Return ONLY the translated text, nothing else.
+    prompt = f"""Detect the language of the following text and translate it accurately to English. Return ONLY the English translation, nothing else. Do not add any explanation or prefix.
 
 Text: {query}"""
 
     result = _call_llm(prompt, max_tokens=100)
     if result:
         # Clean any prefix the model might add
-        for prefix in ['Translation:', 'English:', 'Translated:']:
-            if result.startswith(prefix):
+        for prefix in ['Translation:', 'English:', 'Translated:', 'English translation:']:
+            if result.lower().startswith(prefix.lower()):
                 result = result[len(prefix):].strip()
+        # Remove quotes if wrapped
+        result = result.strip('"').strip("'")
         return result
     return query  # Return original if translation fails

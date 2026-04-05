@@ -25,6 +25,44 @@ def search():
     query = data.get('message', '').strip()
     limit = data.get('limit', 20)
 
+    # Edge case: conversational/greeting queries
+    greetings = [
+        'hello', 'hi', 'hey', 'greetings', 'good morning', 'good evening', 'sup', 'yo',
+        'hola', 'bonjour', 'hallo', 'ciao', 'namaste', 'salaam', 'ola', 'konnichiwa',
+        'howdy', 'whats up', "what's up", 'wassup', 'heya', 'hii', 'hiii', 'helloo',
+    ]
+    meta_queries = [
+        'what is this', 'what does this do', 'help', 'how does this work', 'explain',
+        'what can i do', 'what can you do', 'who are you', 'what are you',
+    ]
+
+    query_lower = query.lower().strip('?!. ')
+    if query_lower in greetings:
+        return jsonify({
+            'answer': 'Hey! I can help you explore a dataset of 8,799 Reddit posts from 10 political subreddits (July 2024 - Feb 2025). Ask me anything about political discourse, media sharing, or community behavior.',
+            'results': [],
+            'follow_up_queries': [
+                'What topics dominated after the inauguration?',
+                'How do conservative and liberal communities differ?',
+                'Which accounts bridge multiple communities?'
+            ],
+            'query_language': 'en',
+            'was_translated': False
+        })
+
+    if query_lower in meta_queries or any(m in query_lower for m in meta_queries):
+        return jsonify({
+            'answer': 'This is a semantic search chatbot over 8,799 Reddit political posts. You can ask questions in natural language and I will find the most relevant posts by meaning, not just keywords. I can also answer in multiple languages. Try asking about specific topics like immigration, elections, or political ideology.',
+            'results': [],
+            'follow_up_queries': [
+                'Show me posts about government surveillance',
+                'How did Reddit react to the 2025 inauguration?',
+                'What are the most controversial posts?'
+            ],
+            'query_language': 'en',
+            'was_translated': False
+        })
+
     # Edge case: empty query
     if not query:
         return jsonify({
@@ -41,26 +79,13 @@ def search():
 
     # Edge case: very short query
     if len(query) < 3:
-        conn = sqlite3.connect(current_app.config['db_path'])
-        top_posts = conn.execute("""
-            SELECT id, title, selftext, subreddit, author, score, num_comments, created_date
-            FROM posts ORDER BY score DESC LIMIT ?
-        """, (limit,)).fetchall()
-        conn.close()
-
-        results = [{
-            'id': p[0], 'title': p[1], 'selftext': p[2][:200],
-            'subreddit': p[3], 'author': p[4], 'score': p[5],
-            'num_comments': p[6], 'date': p[7], 'similarity': None
-        } for p in top_posts]
-
         return jsonify({
-            'answer': f'Your query "{query}" is too short for semantic search. Here are the most popular posts instead.',
-            'results': results,
+            'answer': f'Your query "{query}" is too short for meaningful semantic search. Try a longer, more descriptive query to get relevant results.',
+            'results': [],
             'follow_up_queries': [
-                'What are the main topics in this dataset?',
-                'Show me posts about immigration policy',
-                'How did communities react to the inauguration?'
+                'What topics dominated after the inauguration?',
+                'How do conservative and liberal communities differ?',
+                'Show me posts about immigration policy'
             ],
             'query_language': 'en',
             'was_translated': False
@@ -117,10 +142,28 @@ def search():
                 'similarity': round(sim, 4)
             })
 
+    # Check if results are meaningful (similarity threshold)
+    top_similarity = results[0]['similarity'] if results else 0
+    is_low_quality = top_similarity < 0.45
+
     # Generate LLM response and follow-ups
     from services.llm_service import generate_search_response, generate_follow_up_queries
-    answer = generate_search_response(original_query, results)
-    follow_ups = generate_follow_up_queries(original_query, results)
+
+    if is_low_quality:
+        answer = (
+            f"No strong matches found for \"{original_query}\". "
+            f"The highest similarity score was only {top_similarity:.0%}, which suggests this topic "
+            f"isn't well-represented in the dataset. Try searching for topics like immigration, "
+            f"Trump policies, elections, or political ideology."
+        )
+        follow_ups = [
+            'What topics are most discussed in this dataset?',
+            'How do left and right communities differ?',
+            'Show me the most controversial posts'
+        ]
+    else:
+        answer = generate_search_response(original_query, results)
+        follow_ups = generate_follow_up_queries(original_query, results)
 
     response = {
         'answer': answer,
@@ -131,6 +174,6 @@ def search():
     }
 
     if was_translated:
-        response['translation_note'] = f'Query detected as {lang}. Results are from English-language posts.'
+        response['translation_note'] = f'Non-English query detected and translated. Results are from English-language posts.'
 
     return jsonify(response)

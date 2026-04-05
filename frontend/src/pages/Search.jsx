@@ -53,8 +53,8 @@ export default function Search() {
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <div className="mb-4">
-        <h1 className="text-3xl font-bold text-gray-900">Semantic Search</h1>
-        <p className="text-gray-500 mt-1">Ask questions about the dataset — results ranked by meaning, not keywords</p>
+        <h1 className="text-3xl font-bold text-gray-900">SearchAI</h1>
+        <p className="text-gray-500 mt-1">Semantic search powered by AI — find posts by meaning, not keywords</p>
       </div>
 
       {/* Chat Messages */}
@@ -167,7 +167,7 @@ export default function Search() {
           type="text"
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="Ask about the dataset..."
+          placeholder="Ask anything about political discourse on Reddit..."
           className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           disabled={loading}
         />
