@@ -4,7 +4,10 @@ export default function Embeddings() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Embedding Explorer</h1>
-          <p className="text-gray-500 mt-1">Interactive map of all 8,799 posts — similar posts are near each other</p>
+          <p className="text-gray-500 mt-1">
+            Posts near each other discuss similar themes. Distinct clusters represent different discourse communities.
+            Use this to discover unexpected topic overlaps between subreddits.
+          </p>
         </div>
         <div className="flex items-center gap-3 text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-lg">
           <span><strong>Scroll</strong> to zoom</span>

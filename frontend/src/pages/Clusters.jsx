@@ -52,7 +52,10 @@ export default function Clusters() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Topic Clusters</h1>
-      <p className="text-gray-500 mb-6">Posts grouped by semantic similarity using KMeans on sentence embeddings</p>
+      <p className="text-gray-500 mb-6">
+        Posts are grouped by semantic meaning using KMeans on sentence embeddings (all-MiniLM-L6-v2, 384-dim).
+        Topics emerge automatically — the labels show top keywords per cluster. Adjust the slider to see finer or coarser groupings.
+      </p>
 
       {/* K Slider */}
       <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4 mb-6">

@@ -103,7 +103,10 @@ export default function TimeSeries() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Time Series Analysis</h1>
-      <p className="text-gray-500 mb-6">Post volume and engagement trends over time</p>
+      <p className="text-gray-500 mb-6">
+        Track how political discourse evolves over time. Look for spikes that correlate with real-world events — when volume
+        increases for one subreddit but not others, it may indicate community-specific narratives.
+      </p>
 
       {/* Filters */}
       <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4 mb-6">

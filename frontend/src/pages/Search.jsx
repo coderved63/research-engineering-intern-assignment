@@ -61,7 +61,10 @@ export default function Search() {
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <div className="mb-4">
         <h1 className="text-3xl font-bold text-gray-900">SearchAI</h1>
-        <p className="text-gray-500 mt-1">Semantic search powered by AI — find posts by meaning, not keywords</p>
+        <p className="text-gray-500 mt-1">
+          Semantic search powered by AI — results ranked by meaning, not keywords.
+          Try queries with zero word overlap: e.g., "government overreach" finds posts about "federal surveillance."
+        </p>
       </div>
 
       {/* Chat Messages */}
