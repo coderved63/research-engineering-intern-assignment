@@ -15,6 +15,9 @@ export const getTimeSeriesPosts = (params) =>
 export const getTimeSeriesEngagement = (params) =>
   api.get('/timeseries/engagement', { params })
 
+export const getTopicTrends = (params) =>
+  api.get('/timeseries/topics', { params })
+
 // Search
 export const searchPosts = (data) =>
   api.post('/search', data)

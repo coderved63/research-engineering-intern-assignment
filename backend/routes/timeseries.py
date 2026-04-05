@@ -99,3 +99,29 @@ def engagement_over_time():
     summary = generate_timeseries_summary(series, f'average {metric}', granularity, sub_list)
 
     return jsonify({'series': series, 'metric': metric, 'granularity': granularity, 'summary': summary})
+
+
+@timeseries_bp.route('/topics')
+def topics_over_time():
+    k = request.args.get('k', 8, type=int)
+    granularity = request.args.get('granularity', 'week')
+
+    k = max(2, min(50, k))
+    date_fmt = get_date_format(granularity)
+
+    conn = sqlite3.connect(current_app.config['db_path'])
+
+    rows = conn.execute(f"""
+        SELECT strftime('{date_fmt}', p.created_date) as period,
+               c.cluster_label as topic, COUNT(*) as count
+        FROM posts p
+        JOIN cluster_assignments c ON p.id = c.post_id
+        WHERE c.k = ?
+        GROUP BY period, topic
+        ORDER BY period
+    """, (k,)).fetchall()
+    conn.close()
+
+    series = [{'date': r[0], 'topic': r[1], 'count': r[2]} for r in rows]
+
+    return jsonify({'series': series, 'k': k, 'granularity': granularity})
