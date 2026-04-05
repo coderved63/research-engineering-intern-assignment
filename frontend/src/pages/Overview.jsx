@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getOverviewStats, getTimeSeriesPosts } from '../services/api'
 import MetricCard from '../components/common/MetricCard'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import AISummary from '../components/common/AISummary'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -145,6 +146,13 @@ export default function Overview() {
           </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Executive Summary */}
+      {stats.executive_summary && (
+        <div className="mb-8">
+          <AISummary text={stats.executive_summary} />
+        </div>
+      )}
 
       {/* Top Authors */}
       <div className="bg-white rounded-lg shadow p-6">

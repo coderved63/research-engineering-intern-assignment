@@ -52,7 +52,12 @@ def posts_over_time():
 
     series = [{'date': r[0], 'subreddit': r[1], 'count': r[2]} for r in rows]
 
-    return jsonify({'series': series, 'granularity': granularity})
+    # Generate LLM summary
+    from services.llm_service import generate_timeseries_summary
+    sub_list = [s.strip() for s in subreddits.split(',')] if subreddits else None
+    summary = generate_timeseries_summary(series, 'post count', granularity, sub_list)
+
+    return jsonify({'series': series, 'granularity': granularity, 'summary': summary})
 
 
 @timeseries_bp.route('/engagement')
@@ -88,4 +93,9 @@ def engagement_over_time():
 
     series = [{'date': r[0], 'subreddit': r[1], 'avg': round(r[2], 2), 'count': r[3]} for r in rows]
 
-    return jsonify({'series': series, 'metric': metric, 'granularity': granularity})
+    # Generate LLM summary
+    from services.llm_service import generate_timeseries_summary
+    sub_list = [s.strip() for s in subreddits.split(',')] if subreddits else None
+    summary = generate_timeseries_summary(series, f'average {metric}', granularity, sub_list)
+
+    return jsonify({'series': series, 'metric': metric, 'granularity': granularity, 'summary': summary})

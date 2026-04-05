@@ -71,11 +71,13 @@ def search():
     was_translated = False
     original_query = query
 
-    # For non-English queries, we still embed as-is
-    # all-MiniLM-L6-v2 has some multilingual capability
-    # But note this for the user
+    # For non-English queries, translate to English first
     if lang != 'en':
         was_translated = True
+        from services.llm_service import translate_query
+        translated = translate_query(query, lang)
+        if translated and translated != query:
+            query = translated
 
     # Embed the query
     model = current_app.config['embed_model']
@@ -115,37 +117,10 @@ def search():
                 'similarity': round(sim, 4)
             })
 
-    # Build a basic answer without LLM for now (LLM integration comes later)
-    if results:
-        top_subs = {}
-        for r in results[:10]:
-            top_subs[r['subreddit']] = top_subs.get(r['subreddit'], 0) + 1
-        sub_summary = ', '.join([f"r/{s} ({c})" for s, c in sorted(top_subs.items(), key=lambda x: -x[1])])
-
-        answer = (
-            f"Found {len(results)} relevant posts for \"{original_query}\". "
-            f"Top results come from: {sub_summary}. "
-            f"The highest-scoring result is \"{results[0]['title'][:80]}\" "
-            f"from r/{results[0]['subreddit']} with {results[0]['score']} upvotes."
-        )
-    else:
-        answer = f"No strong matches found for \"{original_query}\". Try a different query."
-
-    # Basic follow-up suggestions based on top result topics
-    follow_ups = []
-    if results:
-        subs_in_results = list(set(r['subreddit'] for r in results[:5]))
-        if len(subs_in_results) >= 2:
-            follow_ups.append(f"How do r/{subs_in_results[0]} and r/{subs_in_results[1]} discuss this differently?")
-        follow_ups.append(f"What are the most debated topics in r/{results[0]['subreddit']}?")
-        follow_ups.append("Show me the most controversial posts on this topic")
-
-    if not follow_ups:
-        follow_ups = [
-            'What topics dominated after the inauguration?',
-            'How do conservative and liberal communities differ?',
-            'Which accounts bridge multiple communities?'
-        ]
+    # Generate LLM response and follow-ups
+    from services.llm_service import generate_search_response, generate_follow_up_queries
+    answer = generate_search_response(original_query, results)
+    follow_ups = generate_follow_up_queries(original_query, results)
 
     response = {
         'answer': answer,

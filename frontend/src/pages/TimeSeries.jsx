@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getTimeSeriesPosts, getTimeSeriesEngagement } from '../services/api'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import AISummary from '../components/common/AISummary'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
   AreaChart, Area
@@ -24,6 +25,8 @@ export default function TimeSeries() {
   const [selectedSubs, setSelectedSubs] = useState([])
   const [postData, setPostData] = useState([])
   const [engagementData, setEngagementData] = useState([])
+  const [postSummary, setPostSummary] = useState('')
+  const [engSummary, setEngSummary] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -47,6 +50,7 @@ export default function TimeSeries() {
           dateMap[item.date][item.subreddit] = item.count
         }
         setPostData(Object.values(dateMap).sort((a, b) => a.date.localeCompare(b.date)))
+        setPostSummary(postRes.data.summary || '')
 
         // Pivot engagement data
         const engMap = {}
@@ -55,6 +59,7 @@ export default function TimeSeries() {
           engMap[item.date][item.subreddit] = item.avg
         }
         setEngagementData(Object.values(engMap).sort((a, b) => a.date.localeCompare(b.date)))
+        setEngSummary(engRes.data.summary || '')
       } catch (err) {
         console.error(err)
       } finally {
@@ -135,6 +140,7 @@ export default function TimeSeries() {
                 ))}
               </LineChart>
             </ResponsiveContainer>
+            <AISummary text={postSummary} />
           </div>
 
           {/* Engagement Chart */}
@@ -153,6 +159,7 @@ export default function TimeSeries() {
                 ))}
               </LineChart>
             </ResponsiveContainer>
+            <AISummary text={engSummary} />
           </div>
         </>
       )}

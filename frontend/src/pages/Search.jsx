@@ -105,11 +105,14 @@ export default function Search() {
                     </p>
                     <div className="space-y-2">
                       {msg.results.slice(0, 10).map((r, j) => (
-                        <div key={r.id} className="border-b border-gray-100 pb-2 last:border-0">
+                        <a key={r.id} href={r.permalink ? `https://reddit.com${r.permalink}` : '#'}
+                          target="_blank" rel="noopener noreferrer"
+                          className="block border-b border-gray-100 pb-2 last:border-0 hover:bg-gray-50 rounded px-1 -mx-1 transition-colors">
                           <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 truncate">
                                 {j + 1}. {r.title}
+                                <span className="text-indigo-400 ml-1 text-xs">↗</span>
                               </p>
                               <p className="text-xs text-gray-500 mt-0.5">
                                 r/{r.subreddit} · u/{r.author} · {r.score} pts · {r.date}
@@ -124,7 +127,7 @@ export default function Search() {
                               </span>
                             )}
                           </div>
-                        </div>
+                        </a>
                       ))}
                     </div>
                   </div>

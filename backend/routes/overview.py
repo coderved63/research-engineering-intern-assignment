@@ -43,7 +43,7 @@ def get_stats():
 
     graph_stats = current_app.config['graph_data'].get('stats', {})
 
-    return jsonify({
+    stats = {
         'total_posts': total_posts,
         'total_authors': total_authors,
         'date_range': {'start': date_range[0], 'end': date_range[1]},
@@ -56,4 +56,10 @@ def get_stats():
             'avg': round(score_stats[2], 1),
         },
         'network_stats': graph_stats
-    })
+    }
+
+    # Generate LLM executive summary
+    from services.llm_service import generate_overview_summary
+    stats['executive_summary'] = generate_overview_summary(stats)
+
+    return jsonify(stats)
