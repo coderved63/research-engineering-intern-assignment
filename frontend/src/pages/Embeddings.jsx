@@ -17,7 +17,7 @@ export default function Embeddings() {
         </div>
       </div>
 
-      <div className="flex-1 bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+      <div className="flex-1 bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm overflow-hidden border border-gray-200">
         <iframe
           src="/static/datamapplot.html"
           title="Embedding Visualization"

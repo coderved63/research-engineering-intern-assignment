@@ -92,7 +92,7 @@ export default function Overview() {
       </div>
 
       {/* Timeline with Events */}
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
+      <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-1">Activity Timeline</h2>
         <p className="text-sm text-gray-500 mb-4">Weekly post volume with key political events marked</p>
         <ResponsiveContainer width="100%" height={300}>
@@ -117,7 +117,7 @@ export default function Overview() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Subreddit Breakdown */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Subreddit Distribution</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -134,7 +134,7 @@ export default function Overview() {
         </div>
 
         {/* Top News Domains */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Top News Sources Shared</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={stats.top_domains.slice(0, 10)} layout="vertical">
@@ -155,7 +155,7 @@ export default function Overview() {
       )}
 
       {/* Top Authors */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Most Active Accounts</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

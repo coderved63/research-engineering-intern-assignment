@@ -147,7 +147,7 @@ export default function Network() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Graph */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-4" ref={containerRef}>
+        <div className="lg:col-span-2 bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4" ref={containerRef}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
               <label className="text-sm text-gray-500">
@@ -217,14 +217,14 @@ export default function Network() {
         <div className="space-y-4">
           {/* Instructions when no node selected */}
           {!selectedNode && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50/70 backdrop-blur-sm border border-blue-200/50 rounded-xl p-4">
               <p className="text-sm text-blue-700">Click on any node in the graph to inspect it and see options to remove it from the network.</p>
             </div>
           )}
 
           {/* Selected Node Info */}
           {selectedNode && (
-            <div className="bg-white rounded-lg shadow p-4">
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4">
               <h3 className="font-semibold text-gray-900 mb-2">u/{selectedNode.id}</h3>
               <div className="text-sm space-y-1.5 text-gray-600">
                 <div className="flex justify-between">
@@ -265,7 +265,7 @@ export default function Network() {
 
           {/* Removal Impact */}
           {removalImpact && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="bg-amber-50/70 backdrop-blur-sm border border-amber-200/50 rounded-xl p-4">
               <h3 className="font-semibold text-amber-900 text-sm mb-2">Removal Impact</h3>
               <p className="text-sm text-amber-800">{removalImpact.impact}</p>
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
@@ -284,7 +284,7 @@ export default function Network() {
           )}
 
           {/* Top Accounts Table */}
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4">
             <h3 className="font-semibold text-gray-900 mb-3 text-sm">Top Accounts by PageRank</h3>
             <div className="space-y-0.5">
               {topAccounts.map((a, i) => (

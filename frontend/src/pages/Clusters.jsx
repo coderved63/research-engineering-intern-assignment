@@ -55,7 +55,7 @@ export default function Clusters() {
       <p className="text-gray-500 mb-6">Posts grouped by semantic similarity using KMeans on sentence embeddings</p>
 
       {/* K Slider */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
+      <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4 mb-6">
         <div className="flex items-center gap-4">
           <label className="text-sm text-gray-600 font-medium">Number of clusters:</label>
           <input type="range" min="2" max="50" value={k}
@@ -81,7 +81,7 @@ export default function Clusters() {
         <>
           {/* Donut chart */}
           <div className="mb-6">
-            <div className="bg-white rounded-lg shadow p-4">
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4">
               <h2 className="text-sm font-semibold text-gray-900 mb-2">Cluster Proportions</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -123,7 +123,7 @@ export default function Clusters() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {clusters.sort((a, b) => b.size - a.size).map(cluster => (
               <div key={cluster.id}
-                className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+                className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full shrink-0"

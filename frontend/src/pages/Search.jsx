@@ -100,7 +100,7 @@ export default function Search() {
                 )}
 
                 {/* AI Answer */}
-                <div className="bg-white rounded-lg shadow p-4">
+                <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4">
                   <p className="text-sm text-gray-700">{msg.content}</p>
                 </div>
 
@@ -110,12 +110,13 @@ export default function Search() {
                     series={msg.timeseries.series}
                     granularity={msg.timeseries.granularity}
                     totalMatching={msg.timeseries.total_matching}
+                    query={messages[i - 1]?.content || ''}
                   />
                 )}
 
                 {/* Results */}
                 {msg.results && msg.results.length > 0 && (
-                  <div className="bg-white rounded-lg shadow p-4">
+                  <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-4">
                     <p className="text-xs text-gray-500 font-medium mb-2">
                       Top {msg.results.length} results
                     </p>
