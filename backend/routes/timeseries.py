@@ -125,3 +125,19 @@ def topics_over_time():
     series = [{'date': r[0], 'topic': r[1], 'count': r[2]} for r in rows]
 
     return jsonify({'series': series, 'k': k, 'granularity': granularity})
+
+
+@timeseries_bp.route('/ask', methods=['POST'])
+def ask_about_chart():
+    """Answer a follow-up question about a chart's data."""
+    data = request.get_json() or {}
+    question = data.get('question', '').strip()
+    context = data.get('context', '').strip()
+
+    if not question:
+        return jsonify({'answer': 'Please ask a question about the data.'})
+
+    from services.llm_service import answer_chart_question
+    answer = answer_chart_question(question, context)
+
+    return jsonify({'answer': answer})

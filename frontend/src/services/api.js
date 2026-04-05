@@ -18,6 +18,9 @@ export const getTimeSeriesEngagement = (params) =>
 export const getTopicTrends = (params) =>
   api.get('/timeseries/topics', { params })
 
+export const askAboutChart = (data) =>
+  api.post('/timeseries/ask', data)
+
 // Search
 export const searchPosts = (data) =>
   api.post('/search', data)

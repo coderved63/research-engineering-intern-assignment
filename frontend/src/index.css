@@ -10,3 +10,106 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* Dark mode overrides for glassmorphic cards */
+.dark-mode .bg-white\/70 {
+  background: rgba(30, 30, 45, 0.7) !important;
+  border-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+.dark-mode .bg-indigo-50\/50 {
+  background: rgba(49, 46, 89, 0.5) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+.dark-mode .bg-indigo-50\/70 {
+  background: rgba(49, 46, 89, 0.5) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+.dark-mode .bg-white\/60 {
+  background: rgba(30, 30, 50, 0.6) !important;
+}
+
+.dark-mode .bg-blue-50\/70 {
+  background: rgba(30, 40, 70, 0.5) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.dark-mode .bg-amber-50\/70 {
+  background: rgba(60, 50, 30, 0.5) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+.dark-mode h1, .dark-mode h2, .dark-mode h3,
+.dark-mode .text-gray-900 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark-mode .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .text-gray-500 {
+  color: #64748b !important;
+}
+
+.dark-mode .text-gray-400 {
+  color: #475569 !important;
+}
+
+.dark-mode .text-indigo-900 {
+  color: #c7d2fe !important;
+}
+
+.dark-mode .text-indigo-700 {
+  color: #a5b4fc !important;
+}
+
+.dark-mode .text-indigo-600 {
+  color: #818cf8 !important;
+}
+
+.dark-mode .border-gray-200 {
+  border-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+.dark-mode .border-gray-100 {
+  border-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+.dark-mode input, .dark-mode select {
+  background: rgba(30, 30, 50, 0.8) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+.dark-mode .bg-gray-100 {
+  background: rgba(55, 55, 75, 0.6) !important;
+}
+
+.dark-mode .bg-gray-50 {
+  background: rgba(40, 40, 60, 0.6) !important;
+}
+
+.dark-mode table {
+  color: #cbd5e1;
+}
+
+.dark-mode .recharts-text {
+  fill: #94a3b8 !important;
+}
+
+.dark-mode .recharts-cartesian-grid line {
+  stroke: rgba(99, 102, 241, 0.1) !important;
+}
+
+.dark-mode .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: rgba(30, 30, 50, 0.95) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+  color: #e2e8f0 !important;
+}

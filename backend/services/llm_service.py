@@ -8,15 +8,20 @@ import os
 import hashlib
 import google.generativeai as genai
 
-# Configure on import
-api_key = os.environ.get('GEMINI_API_KEY', '')
-model_name = os.environ.get('GEMINI_MODEL', 'gemma-3-27b-it')
-
-if api_key:
-    genai.configure(api_key=api_key)
-
 # Simple in-memory cache
 _cache = {}
+_configured = False
+
+
+def _ensure_configured():
+    """Configure API on first use, not on import."""
+    global _configured
+    if _configured:
+        return
+    api_key = os.environ.get('GEMINI_API_KEY', '')
+    if api_key:
+        genai.configure(api_key=api_key)
+        _configured = True
 
 
 def _get_cache_key(prompt):
@@ -29,16 +34,19 @@ def _call_llm(prompt, max_tokens=500):
     if cache_key in _cache:
         return _cache[cache_key]
 
+    _ensure_configured()
+    api_key = os.environ.get('GEMINI_API_KEY', '')
     if not api_key:
         return None
 
+    model_name = os.environ.get('GEMINI_MODEL', 'gemma-3-27b-it')
     try:
         model = genai.GenerativeModel(model_name)
         response = model.generate_content(
             prompt,
             generation_config=genai.types.GenerationConfig(
                 max_output_tokens=max_tokens,
-                temperature=0.7,
+                temperature=0.3,
             )
         )
         result = response.text.strip()
@@ -54,8 +62,7 @@ def generate_timeseries_summary(series_data, metric, granularity, subreddits=Non
     if not series_data:
         return "No data available for this selection."
 
-    # Build a concise data description for the LLM
-    sub_filter = f"filtered to {', '.join(subreddits)}" if subreddits else "across all subreddits"
+    sub_filter = f"filtered to r/{', r/'.join(subreddits)}" if subreddits else "across all 10 subreddits"
 
     # Aggregate totals per period
     period_totals = {}
@@ -73,31 +80,42 @@ def generate_timeseries_summary(series_data, metric, granularity, subreddits=Non
 
     peak_period = max(period_totals, key=period_totals.get)
     peak_val = period_totals[peak_period]
+    lowest_period = min(period_totals, key=period_totals.get)
+    lowest_val = period_totals[lowest_period]
     top_sub = max(sub_totals, key=sub_totals.get) if sub_totals else "N/A"
+    top_3_subs = sorted(sub_totals.items(), key=lambda x: -x[1])[:3]
 
-    prompt = f"""You are analyzing Reddit political discourse data. Write a 2-3 sentence summary of this time-series data for a non-technical audience.
+    prompt = f"""Write a 2-3 sentence plain-language summary explaining this chart to someone who cannot read charts. They should understand the key trend just by reading your summary.
 
-Data: {metric} per {granularity}, {sub_filter}
-Time range: {periods[0]} to {periods[-1]}
-Total data points: {len(periods)} {granularity}s
-Peak {granularity}: {peak_period} with {peak_val:.0f}
-Most active subreddit: r/{top_sub} ({sub_totals.get(top_sub, 0):.0f} total)
-First period value: {period_totals.get(periods[0], 0):.0f}
-Last period value: {period_totals.get(periods[-1], 0):.0f}
+IMPORTANT: The dataset covers Reddit posts from July 2024 to February 2025 ONLY. Do NOT mention any dates outside this range.
 
-Write a concise, insightful summary. Mention specific dates, subreddits, and numbers. Do NOT say "the chart shows" or "the data shows" — just state the findings directly. Focus on trends, spikes, or notable patterns."""
+What the chart shows: {metric} per {granularity}, {sub_filter}
+Period covered: {periods[0]} to {periods[-1]}
+Number of {granularity}s shown: {len(periods)}
+Lowest point: {lowest_period} with {lowest_val:.0f}
+Highest point: {peak_period} with {peak_val:.0f}
+Top 3 subreddits by volume: {', '.join([f'r/{s} ({v:.0f})' for s, v in top_3_subs])}
+Starting value: {period_totals.get(periods[0], 0):.0f}
+Ending value: {period_totals.get(periods[-1], 0):.0f}
+
+Rules:
+- State findings directly, do NOT say "the chart shows" or "the data shows"
+- Use ONLY the numbers provided above — do not invent or hallucinate any numbers
+- Explain what happened in simple terms a journalist could use
+- Mention at least one specific subreddit name and one specific number"""
 
     result = _call_llm(prompt, max_tokens=200)
     if result:
         return result
 
     # Fallback: rule-based summary
-    change = period_totals.get(periods[-1], 0) - period_totals.get(periods[0], 0)
-    direction = "increased" if change > 0 else "decreased"
+    change_pct = ((period_totals.get(periods[-1], 0) - period_totals.get(periods[0], 1)) / max(period_totals.get(periods[0], 1), 1)) * 100
+    direction = "increased" if change_pct > 0 else "decreased"
     return (
-        f"Activity {direction} over the period from {periods[0]} to {periods[-1]}. "
-        f"The peak occurred during {peak_period} with {peak_val:.0f} {metric}. "
-        f"r/{top_sub} was the most active subreddit."
+        f"Activity {direction} from {period_totals.get(periods[0], 0):.0f} to {period_totals.get(periods[-1], 0):.0f} "
+        f"over the period ({periods[0]} to {periods[-1]}). "
+        f"The peak occurred at {peak_period} with {peak_val:.0f} {metric}. "
+        f"r/{top_sub} was the most active subreddit with {sub_totals.get(top_sub, 0):.0f} total."
     )
 
 
@@ -207,6 +225,24 @@ Write a 3-4 sentence executive summary that a journalist could use. Highlight wh
         f"The period covers the 2024 US presidential election through the first weeks of the new administration. "
         f"Top shared news sources include {', '.join([d['domain'] for d in stats['top_domains'][:3]])}."
     )
+
+
+def answer_chart_question(question, data_context):
+    """Answer a user's follow-up question about a specific chart's data."""
+    prompt = f"""You are analyzing a chart from a Reddit political discourse dashboard (8,799 posts from 10 subreddits, Jul 2024 - Feb 2025).
+
+Chart data and context:
+{data_context}
+
+User question: "{question}"
+
+Answer in 2-3 sentences using SPECIFIC numbers and subreddit names from the data above. Do not be vague — cite actual counts, dates, and subreddit names. If the question is not about the data (e.g., "who is trump?"), briefly answer from general knowledge but redirect to what the data shows about that topic."""
+
+    result = _call_llm(prompt, max_tokens=200)
+    if result:
+        return result
+
+    return "I couldn't generate an answer for this question. Try rephrasing or ask in the SearchAI page for a broader analysis."
 
 
 def translate_query(query, source_lang):
