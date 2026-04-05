@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { searchPosts } from '../services/api'
+import { searchPosts, searchTimeSeries } from '../services/api'
+import SearchTrendChart from '../components/common/SearchTrendChart'
 
 export default function Search() {
   const [input, setInput] = useState('')
@@ -21,13 +22,19 @@ export default function Search() {
     setLoading(true)
 
     try {
-      const res = await searchPosts({ message: q })
-      const data = res.data
+      const [searchRes, tsRes] = await Promise.allSettled([
+        searchPosts({ message: q }),
+        searchTimeSeries({ message: q, granularity: 'week' })
+      ])
+
+      const data = searchRes.status === 'fulfilled' ? searchRes.value.data : { answer: 'Search failed.', results: [], follow_up_queries: [] }
+      const tsData = tsRes.status === 'fulfilled' ? tsRes.value.data : null
 
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: data.answer,
         results: data.results,
+        timeseries: tsData,
         follow_ups: data.follow_up_queries,
         language: data.query_language,
         translated: data.was_translated,
@@ -96,6 +103,15 @@ export default function Search() {
                 <div className="bg-white rounded-lg shadow p-4">
                   <p className="text-sm text-gray-700">{msg.content}</p>
                 </div>
+
+                {/* Time-Series Chart */}
+                {msg.timeseries && msg.timeseries.series && msg.timeseries.series.length > 0 && (
+                  <SearchTrendChart
+                    series={msg.timeseries.series}
+                    granularity={msg.timeseries.granularity}
+                    totalMatching={msg.timeseries.total_matching}
+                  />
+                )}
 
                 {/* Results */}
                 {msg.results && msg.results.length > 0 && (

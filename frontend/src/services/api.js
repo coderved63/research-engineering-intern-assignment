@@ -19,6 +19,9 @@ export const getTimeSeriesEngagement = (params) =>
 export const searchPosts = (data) =>
   api.post('/search', data)
 
+export const searchTimeSeries = (data) =>
+  api.post('/search/timeseries', data)
+
 // Network
 export const getNetworkGraph = (params) =>
   api.get('/network/graph', { params })
