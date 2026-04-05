@@ -41,18 +41,31 @@ def get_clusters():
                     clusters[cluster_id] = {'id': cluster_id, 'label': label, 'post_ids': []}
                 clusters[cluster_id]['post_ids'].append(post_id)
 
-            # Get top posts per cluster
+            # Get top posts and subreddit breakdown per cluster
             for cid in clusters:
-                pids = clusters[cid]['post_ids'][:5]
-                placeholders = ','.join(['?' for _ in pids])
+                all_pids = clusters[cid]['post_ids']
+                clusters[cid]['size'] = len(all_pids)
+
+                # Top 10 posts by score
+                placeholders = ','.join(['?' for _ in all_pids])
                 top = conn.execute(f"""
-                    SELECT id, title, subreddit, score FROM posts
-                    WHERE id IN ({placeholders}) ORDER BY score DESC
-                """, pids).fetchall()
-                clusters[cid]['size'] = len(clusters[cid]['post_ids'])
+                    SELECT id, title, subreddit, score, author, permalink, created_date FROM posts
+                    WHERE id IN ({placeholders}) ORDER BY score DESC LIMIT 10
+                """, all_pids).fetchall()
                 clusters[cid]['top_posts'] = [
-                    {'id': t[0], 'title': t[1], 'subreddit': t[2], 'score': t[3]} for t in top
+                    {'id': t[0], 'title': t[1], 'subreddit': t[2], 'score': t[3],
+                     'author': t[4], 'permalink': t[5], 'date': t[6]} for t in top
                 ]
+
+                # Subreddit breakdown
+                sub_counts = conn.execute(f"""
+                    SELECT subreddit, COUNT(*) as count FROM posts
+                    WHERE id IN ({placeholders}) GROUP BY subreddit ORDER BY count DESC
+                """, all_pids).fetchall()
+                clusters[cid]['subreddits'] = [
+                    {'name': s[0], 'count': s[1]} for s in sub_counts
+                ]
+
                 del clusters[cid]['post_ids']
 
             conn.close()

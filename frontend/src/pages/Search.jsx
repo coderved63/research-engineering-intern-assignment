@@ -135,7 +135,7 @@ export default function Search() {
                                 <span className="text-indigo-400 ml-1 text-xs">↗</span>
                               </p>
                               <p className="text-xs text-gray-500 mt-0.5">
-                                r/{r.subreddit} · u/{r.author} · {r.score} pts · {r.date}
+                                r/{r.subreddit} · u/{r.author} · {r.score} upvotes · {r.date}
                               </p>
                               {r.selftext && (
                                 <p className="text-xs text-gray-400 mt-1 line-clamp-2">{r.selftext}</p>

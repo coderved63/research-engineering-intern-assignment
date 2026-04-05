@@ -263,7 +263,11 @@ export default function Overview() {
                 return (
                   <tr key={a.author} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-2 px-3 font-medium text-gray-900">
-                      {i + 1}. u/{a.author}
+                      {i + 1}.{' '}
+                      <a href={`https://reddit.com/u/${a.author}`} target="_blank" rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 hover:underline">
+                        u/{a.author} <span className="text-indigo-400 text-xs">↗</span>
+                      </a>
                     </td>
                     <td className="py-2 px-3 text-right text-gray-600">{a.count}</td>
                     <td className="py-2 px-3 text-right">
