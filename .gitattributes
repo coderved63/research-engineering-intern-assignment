@@ -1,6 +1,2 @@
 frontend/package-lock.json linguist-generated
 backend/static/datamapplot.html linguist-generated
-backend/data/embeddings.npy filter=lfs diff=lfs merge=lfs -text
-backend/data/posts.db filter=lfs diff=lfs merge=lfs -text
-backend/data/embeddings.npy !text !filter !merge !diff
-backend/data/posts.db !text !filter !merge !diff

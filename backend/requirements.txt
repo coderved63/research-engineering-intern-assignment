@@ -23,7 +23,7 @@ python-louvain==0.16
 google-generativeai==0.8.5
 
 # Visualization
-datamapplot==0.4.5
+datamapplot>=0.4.0
 
 # NLP utilities
 langdetect==1.0.9

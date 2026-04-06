@@ -19,8 +19,16 @@ RUN cd frontend && npm ci
 COPY frontend/ frontend/
 RUN cd frontend && npm run build
 
-# Copy backend (includes pre-computed data)
+# Copy backend code and small data files
 COPY backend/ backend/
+COPY data.jsonl .
+
+# Generate large data files during build (avoids LFS requirement)
+RUN cd backend && python pipeline/ingest.py
+RUN cd backend && python pipeline/embed.py
+RUN cd backend && python pipeline/reduce_dims.py
+RUN cd backend && python pipeline/build_graph.py
+RUN cd backend && python pipeline/cluster.py
 
 # Expose port (HF Spaces uses 7860)
 EXPOSE 7860
