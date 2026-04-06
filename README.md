@@ -160,21 +160,94 @@ python pipeline/build_datamapplot.py  # Embedding visualization HTML
 
 ## Architecture
 
+### System Overview
+
 ```
-data.jsonl (8,799 Reddit posts)
+┌─────────────────────────────────────────────────────────────────────┐
+│                        CLIENT (Browser)                             │
+│                                                                     │
+│  React.js SPA (Vite build)                                         │
+│  ├── Overview    — metrics, timeline, key findings                 │
+│  ├── Time Series — post volume, engagement, topic trends           │
+│  ├── Network     — force-directed graph, node removal              │
+│  ├── Topics      — KMeans clusters, donut chart, detail panels     │
+│  ├── SearchAI    — semantic search chatbot, time-series chart      │
+│  └── Embeddings  — Datamapplot interactive visualization           │
+│                                                                     │
+│  Libraries: Recharts, react-force-graph-2d, Axios, Tailwind CSS    │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │ HTTP (same origin)
+                           ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                      FLASK SERVER (gunicorn)                         │
+│                                                                      │
+│  API Endpoints:                                                      │
+│  ├── /api/v1/overview/stats        — dataset statistics              │
+│  ├── /api/v1/timeseries/posts      — post volume over time          │
+│  ├── /api/v1/timeseries/engagement — engagement metrics over time   │
+│  ├── /api/v1/timeseries/topics     — topic trends over time         │
+│  ├── /api/v1/search                — semantic search + LLM answer   │
+│  ├── /api/v1/search/timeseries     — search results over time       │
+│  ├── /api/v1/network/graph         — network with centrality        │
+│  ├── /api/v1/network/remove-node   — node removal simulation       │
+│  └── /api/v1/clusters              — topic clusters with tunable k  │
+│                                                                      │
+│  In-memory at startup:                                               │
+│  ├── embeddings.npy (8799 × 384)     — sentence embeddings          │
+│  ├── graph.json (320 nodes, 773 edges) — pre-computed network       │
+│  └── SentenceTransformer model        — for query embedding         │
+│                                                                      │
+│  On-disk: posts.db (SQLite)                                          │
+└──────────────────────────┬───────────────────────────────────────────┘
+                           │ API call (LLM only)
+                           ▼
+                  ┌─────────────────┐
+                  │  Google AI       │
+                  │  Gemma 3 27B     │
+                  │  - chart summaries│
+                  │  - search answers │
+                  │  - translations   │
+                  └─────────────────┘
+```
+
+### Data Pipeline (runs once during build)
+
+```
+data.jsonl (8,799 Reddit posts, 44MB)
     │
-    ├── ingest.py → posts.db (SQLite)
-    ├── embed.py → embeddings.npy (8799 × 384)
-    ├── reduce_dims.py → umap_coords.npy (8799 × 2)
-    ├── build_graph.py → graph.json (320 nodes, 773 edges)
-    ├── cluster.py → cluster assignments in SQLite
+    ├── ingest.py ──────────→ posts.db (SQLite, 16MB)
+    │                         8,799 rows, indexed by subreddit/author/date
+    │
+    ├── embed.py ───────────→ embeddings.npy (8799 × 384, 13MB)
+    │                         all-MiniLM-L6-v2, L2-normalized
+    │
+    ├── reduce_dims.py ─────→ umap_coords.npy (8799 × 2)
+    │                         UMAP: n_neighbors=15, min_dist=0.1, cosine
+    │
+    ├── build_graph.py ─────→ graph.json (320 nodes, 773 edges)
+    │                         3 edge types, PageRank, betweenness, Louvain
+    │                         [deleted] excluded
+    │
+    ├── cluster.py ─────────→ cluster_assignments in SQLite
+    │                         KMeans for k=3,5,8,10,15,20,30,50
+    │
     └── build_datamapplot.py → datamapplot.html
-            │
-            ▼
-    Flask API (serves pre-computed data + runtime search/LLM)
-            │
-            ▼
-    React Frontend (Recharts, force-graph, Datamapplot iframe)
+                               Interactive embedding visualization
+```
+
+### Runtime Data Flow (per search query)
+
+```
+User types "immigration policy"
+    │
+    ├─ 1. Validate input (not empty, not greeting)
+    ├─ 2. Detect language → "en" (if non-English → translate via LLM)
+    ├─ 3. Embed query with all-MiniLM-L6-v2 → 384-dim vector (~5ms)
+    ├─ 4. Cosine similarity: query × 8,799 embeddings (<10ms)
+    ├─ 5. Rank by similarity, take top 20
+    ├─ 6. Fetch post details from SQLite
+    ├─ 7. LLM generates conversational answer (~3-5s)
+    └─ 8. Return: answer + results + follow-up suggestions + time-series
 ```
 
 Pre-computed artifacts are generated once during the pipeline phase. At runtime, the only computation is query embedding (~5ms), cosine similarity search (<10ms), and LLM API calls (~3-5s).
