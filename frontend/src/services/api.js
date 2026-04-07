@@ -51,4 +51,8 @@ export const getOverviewStats = () =>
 export const getEmbeddingsSummary = () =>
   api.get('/embeddings/summary')
 
+// Compare two subreddits
+export const getCompareSubreddits = (sub1, sub2) =>
+  api.get('/compare', { params: { sub1, sub2 } })
+
 export default api

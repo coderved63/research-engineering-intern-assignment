@@ -7,6 +7,7 @@ import Network from './pages/Network'
 import Clusters from './pages/Clusters'
 import Search from './pages/Search'
 import Embeddings from './pages/Embeddings'
+import Compare from './pages/Compare'
 
 function DashboardRoutes() {
   return (
@@ -16,6 +17,7 @@ function DashboardRoutes() {
         <Route path="/timeseries" element={<TimeSeries />} />
         <Route path="/network" element={<Network />} />
         <Route path="/clusters" element={<Clusters />} />
+        <Route path="/compare" element={<Compare />} />
         <Route path="/search" element={<Search />} />
         <Route path="/embeddings" element={<Embeddings />} />
       </Routes>

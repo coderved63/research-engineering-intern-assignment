@@ -365,6 +365,59 @@ Use specific numbers throughout. Do NOT use markdown, bullet points, or headers 
     return None
 
 
+def generate_comparison_summary(sub1, sub2):
+    """Generate an analytical comparison between two subreddits."""
+    sub1_domains = ', '.join([f"{d['domain']} ({d['count']})" for d in sub1['top_domains'][:5]])
+    sub2_domains = ', '.join([f"{d['domain']} ({d['count']})" for d in sub2['top_domains'][:5]])
+    sub1_topics = '; '.join([t['label'] for t in sub1['top_topics'][:3]])
+    sub2_topics = '; '.join([t['label'] for t in sub2['top_topics'][:3]])
+    sub1_top_author = sub1['top_authors'][0] if sub1['top_authors'] else None
+    sub2_top_author = sub2['top_authors'][0] if sub2['top_authors'] else None
+
+    prompt = f"""Write a detailed plain-text analytical comparison (NO markdown, NO headers, NO #) of two Reddit subreddits from a dataset of 8,799 posts (10 subreddits collected for their political associations, July 2024 to February 2025, covering the 2024 US election and 2025 inauguration).
+
+SUBREDDIT 1: r/{sub1['name']}
+- Total posts: {sub1['total_posts']}
+- Unique authors: {sub1['unique_authors']}
+- Average upvotes per post: {sub1['avg_score']}
+- Average comments per post: {sub1['avg_comments']}
+- Top news sources shared: {sub1_domains}
+- Top discussion topics: {sub1_topics}
+- Most active author: {f"u/{sub1_top_author['author']} ({sub1_top_author['count']} posts)" if sub1_top_author else 'N/A'}
+
+SUBREDDIT 2: r/{sub2['name']}
+- Total posts: {sub2['total_posts']}
+- Unique authors: {sub2['unique_authors']}
+- Average upvotes per post: {sub2['avg_score']}
+- Average comments per post: {sub2['avg_comments']}
+- Top news sources shared: {sub2_domains}
+- Top discussion topics: {sub2_topics}
+- Most active author: {f"u/{sub2_top_author['author']} ({sub2_top_author['count']} posts)" if sub2_top_author else 'N/A'}
+
+Write 4 paragraphs (3-4 sentences each) covering:
+
+Paragraph 1 — Engagement comparison:
+Compare total post counts, unique authors, average upvotes, and average comments. Which community is more active? Which gets more engagement per post? What does the ratio of authors to posts tell us about whether discussion is concentrated in a few hands or distributed widely?
+
+Paragraph 2 — Information ecosystem:
+Compare the news sources each community shares. Are they reading the same outlets, or completely different ones? Cite at least 3 specific domains by name. What does this tell us about the information ecosystems each community is plugged into?
+
+Paragraph 3 — Topical focus:
+Compare the dominant topics in each community. Are they discussing the same events from different angles, or are they focused on entirely different concerns? Reference specific topic keywords from the data.
+
+Paragraph 4 — The takeaway:
+What's the most striking difference between these two communities? Is there evidence of narrative divergence, echo chambers, or shared concerns? End with a concrete observation that a journalist could use as the seed for a story.
+
+Use ONLY the data above. Be specific with numbers and names. Do NOT use markdown formatting — write flowing analytical prose."""
+
+    result = _call_llm(prompt, max_tokens=700)
+    if result:
+        import re
+        cleaned = re.sub(r'^#{1,4}\s+.*$', '', result, flags=re.MULTILINE).strip()
+        return cleaned.replace('**', '')
+    return None
+
+
 def generate_embeddings_summary(stats):
     """Generate a plain-language summary explaining what the embedding visualization shows."""
     subreddit_list = ', '.join([f"r/{s['name']} ({s['count']})" for s in stats.get('subreddits', [])[:10]])
