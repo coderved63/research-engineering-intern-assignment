@@ -1,6 +1,6 @@
-# TheScope — Political Discourse Analysis Dashboard
+# TheScope — Tracing Narratives Across Reddit Communities
 
-A full-stack investigative dashboard analyzing how 10 politically diverse Reddit communities discussed the 2024 US election and 2025 transition of power.
+A full-stack investigative reporting dashboard analyzing how a curated set of Reddit communities discussed the 2024 US election and 2025 transition of power. Nine of the ten subreddits are explicitly political; the tenth (r/worldpolitics) is included as a documented case of unmoderated community drift.
 
 **Live Demo**: [https://huggingface.co/spaces/mv63/thescope-dashboard](https://huggingface.co/spaces/mv63/thescope-dashboard)
 
@@ -8,7 +8,7 @@ A full-stack investigative dashboard analyzing how 10 politically diverse Reddit
 
 ## What This Project Does
 
-This dashboard analyzes 8,799 Reddit posts from 10 subreddits spanning the political spectrum (r/Anarchism to r/Conservative), collected between July 2024 and February 2025. It combines NLP (sentence embeddings, topic clustering, semantic search) with network analysis (PageRank, betweenness centrality, Louvain community detection) to trace how political narratives spread across communities.
+This dashboard analyzes 8,799 Reddit posts from 10 subreddits collected between July 2024 and February 2025. Nine of the subreddits span the political spectrum from far-left (r/Anarchism, r/socialism) to far-right (r/Conservative, r/Republican); the tenth (r/worldpolitics) was originally political but has drifted into largely unmoderated, off-topic content and is included as a documented case study in community drift. The dashboard combines NLP (sentence embeddings, topic clustering, semantic search) with network analysis (PageRank, betweenness centrality, Louvain community detection) to trace how narratives spread across these communities.
 
 The research question: **How do politically diverse communities process the same events — and who bridges the divides?**
 
@@ -54,7 +54,14 @@ The research question: **How do politically diverse communities process the same
 - Handles extreme k values gracefully (clamped with warning)
 - AI-generated cluster summary
 
-### 5. SearchAI (Semantic Search Chatbot)
+### 5. Compare Communities
+- Side-by-side comparison of any two subreddits in the dataset
+- Each side shows: total posts, unique authors, average score and comments, top 10 news domains, top 5 discussion topics, top 10 most active authors (clickable to Reddit), top 5 highest-scoring posts
+- Overlapping line chart showing both communities' weekly post volume on the same axes
+- AI-generated 4-paragraph analytical comparison covering engagement, information ecosystems, topical focus, and a journalist-ready takeaway
+- Default comparison: r/Conservative vs r/socialism (maximum political contrast)
+
+### 6. SearchAI (Semantic Search Chatbot)
 - Results ranked by semantic similarity, not keyword matching
 - Chat-style interface with conversation history
 - Time-series chart showing matching posts over time (with day/week/month toggle)
@@ -62,10 +69,11 @@ The research question: **How do politically diverse communities process the same
 - Clickable results link directly to Reddit posts
 - Handles edge cases: empty input, short queries, non-English input, gibberish
 
-### 6. Embedding Explorer
+### 7. Embedding Explorer
 - Interactive Datamapplot visualization of all 8,799 posts in 2D (UMAP projection)
 - Zoom, pan, and search within the embedding space
 - Posts near each other discuss similar themes
+- AI-generated 4-paragraph explanation of how to read the embedding map (for non-technical users)
 
 ---
 
@@ -98,7 +106,7 @@ The rubric requires queries with zero keyword overlap returning correct results.
 | **Topic Clustering** | KMeans (scikit-learn) | k tunable 2-50, pre-computed for k=3,5,8,10,15,20,30,50, cosine distance on embedding space |
 | **Dimensionality Reduction** | UMAP (umap-learn) | n_components=2, n_neighbors=15, min_dist=0.1, metric=cosine, random_state=42 |
 | **Network Analysis** | PageRank + Betweenness centrality (NetworkX), Louvain community detection (python-louvain) | 3 edge types with weights 3.0/2.0/1.0, [deleted] excluded |
-| **LLM Summaries** | Gemma 3 27B (Google AI via google-generativeai) | temperature=0.3, max_tokens=200-300, in-memory caching |
+| **LLM Summaries** | Gemma 3 27B (Google AI via google-generativeai) | temperature=0.3, max_tokens=500-700, in-memory caching, used for chart summaries, search answers, cluster analysis, network analysis, embedding explanations, and community comparison |
 | **Embedding Visualization** | Datamapplot | Interactive HTML with search, zoom, pan |
 | **Language Detection** | langdetect | Used for non-English query detection before LLM translation |
 | **Semantic Search** | Cosine similarity via numpy dot product on L2-normalized embeddings | Threshold 0.45 for quality, 0.30 for time-series matching |
@@ -167,10 +175,12 @@ python pipeline/build_datamapplot.py  # Embedding visualization HTML
 │                        CLIENT (Browser)                             │
 │                                                                     │
 │  React.js SPA (Vite build)                                         │
+│  ├── Landing     — animated hero with call to action               │
 │  ├── Overview    — metrics, timeline, key findings                 │
 │  ├── Time Series — post volume, engagement, topic trends           │
 │  ├── Network     — force-directed graph, node removal              │
 │  ├── Topics      — KMeans clusters, donut chart, detail panels     │
+│  ├── Compare     — side-by-side comparison of two communities      │
 │  ├── SearchAI    — semantic search chatbot, time-series chart      │
 │  └── Embeddings  — Datamapplot interactive visualization           │
 │                                                                     │
@@ -183,6 +193,8 @@ python pipeline/build_datamapplot.py  # Embedding visualization HTML
 │                                                                      │
 │  API Endpoints:                                                      │
 │  ├── /api/v1/overview/stats        — dataset statistics              │
+│  ├── /api/v1/compare               — side-by-side subreddit compare  │
+│  ├── /api/v1/embeddings/summary    — AI explanation of embedding map │
 │  ├── /api/v1/timeseries/posts      — post volume over time          │
 │  ├── /api/v1/timeseries/engagement — engagement metrics over time   │
 │  ├── /api/v1/timeseries/topics     — topic trends over time         │
@@ -268,3 +280,13 @@ Pre-computed artifacts are generated once during the pipeline phase. At runtime,
 | Non-existent node removal | 404 with "Author not found" message |
 | Disconnected graph components | Count displayed in stats, no crash |
 | Greeting ("hello", "hola") | Friendly intro + suggestion chips |
+
+---
+
+## A Note on r/worldpolitics
+
+r/worldpolitics is one of the 10 subreddits in this dataset and is a known case study in unmoderated community drift — what was originally a political discussion sub became almost entirely off-topic and NSFW content over time. Every post in this subreddit is flagged `over_18 = true` in the source data.
+
+I chose to keep r/worldpolitics in all analyses (stats, network graph, clusters, embeddings) because removing it would invalidate the comparison with the other 9 moderated political subreddits and change the network topology. The contrast between 9 moderated communities and 1 unmoderated one is itself a finding worth surfacing — it's exactly the kind of "actor or community drift" SimPPL builds tools to study.
+
+Where individual post titles are shown in the UI (Compare, Clusters, Search), I display a small contextual note next to r/worldpolitics content rather than filtering it out. The dashboard is a research tool, not a consumer product — hiding data would be editorializing.

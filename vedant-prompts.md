@@ -168,10 +168,53 @@ The final feature work was adding the narrative content — the methodology sect
 
 ### Stage 7: Deployment
 
-With everything stress-tested and working locally, the last step was deploying to a public URL. The first attempt on Render.com failed, leading to a switch to Hugging Face Spaces.
+With everything stress-tested and working locally, the next step was deploying to a public URL. The first attempt on Render.com failed, leading to a switch to Hugging Face Spaces.
 
 ## Prompt 16
 **Component**: Deployment configuration (`Dockerfile`)
 **Prompt**: "Configure a Dockerfile for Hugging Face Spaces — Python 3.11, Node.js 22, build the React frontend, run the data pipeline during Docker build, serve with gunicorn on port 7860."
 **Issue**: Initial deployment on Render.com failed with out-of-memory on the 512MB free tier — sentence-transformer model (~90MB) plus embeddings (13MB) plus Flask overhead exceeded the limit.
 **Fix**: Switched to Hugging Face Spaces (16GB RAM on Docker free tier). Restructured Dockerfile to run the full pipeline during Docker build so large pre-computed files don't need to be committed (avoiding GitHub fork LFS restrictions).
+
+---
+
+### Stage 8: Compare Communities (post-launch addition)
+
+After the dashboard was already deployed and working, the most striking insight from playing with the data was how differently each community discussed the same events. The existing pages let you explore one community at a time, but didn't make the contrast obvious. The Compare Communities page was added to fill that gap — letting a user pick any two of the 10 subreddits and see them side by side.
+
+## Prompt 17
+**Component**: Compare Communities backend endpoint (`backend/routes/overview.py`)
+**Prompt**: "Add a /compare endpoint that takes two subreddit names and returns side-by-side stats for both: total posts, unique authors, average score and comments, top news domains, top authors, top topics from existing cluster assignments, top posts, and weekly time series. Use the existing cluster_assignments table for topics — don't recompute."
+**Issue**: The first version recomputed clusters per subreddit on every request, which was slow and unnecessary since cluster assignments are already pre-computed for k=15 in the SQLite table.
+**Fix**: Joined `posts` with `cluster_assignments` directly in SQL with `WHERE p.subreddit = ? AND c.k = 15` to read pre-computed cluster labels per post, group by label, and order by count. The whole comparison endpoint runs in under 100ms even with the LLM call. Also added validation for invalid subreddit names and same-subreddit comparison (returns 400 with a clear message).
+
+## Prompt 18
+**Component**: Compare Communities LLM analysis prompt (`backend/services/llm_service.py`)
+**Prompt**: "Write an LLM prompt for generating a 4-paragraph analytical comparison of two subreddits. The four paragraphs should cover engagement comparison, information ecosystem (news sources), topical focus, and a journalist-ready takeaway. The output must reference specific numbers and domain names from the data, not be generic."
+**Issue**: The first version of the prompt produced generic output like "These two communities have different perspectives on political issues" — true but useless. It wasn't anchored to the actual data points being passed in.
+**Fix**: Restructured the prompt to require specific numbered claims for each paragraph and explicitly listed every data point the model should cite (top 5 domains by name, top 3 topics by keyword string, exact author counts). Also added the instruction "End with a concrete observation that a journalist could use as the seed for a story" — this dramatically improved the quality of the takeaway sentence by giving the model a clear audience.
+
+## Prompt 19
+**Component**: Compare Communities side-by-side React layout (`frontend/src/pages/Compare.jsx`)
+**Prompt**: "Build a React page with two subreddit picker dropdowns separated by a 'VS' pill, then a side-by-side grid showing matching cards for each subreddit (metrics, top news, top topics, top authors, top posts), then an overlapping line chart of both communities' weekly post volume on the same axes, then an AI summary at the bottom."
+**Issue**: The first layout used `grid-cols-2` for the side-by-side, but the cards inside had wildly different heights because some subreddits have more news domains than others. The result was uneven, ragged columns that looked broken.
+**Fix**: Changed each side into a single bordered card with internal sections separated by `border-b`, so the visual structure stays uniform even when content lengths differ. Added a gradient header colored by the subreddit's signature color so users can immediately tell which side is which without reading the label. Also added click-through Reddit links on every author and post.
+
+## Prompt 20
+**Component**: Stretching AI summaries to be substantive (`backend/services/llm_service.py`)
+**Prompt**: "My AI summaries on the time series, network, and overview pages are only 2-3 sentences with max_tokens=200. They're too short to actually help a non-technical reader understand the chart. Make them 4-6 sentences with proper context, specific numbers, and a takeaway."
+**Issue**: Just bumping max_tokens didn't help — the model still wrote short responses because the prompts said "2-3 sentences." The instructions in the prompt itself were the bottleneck.
+**Fix**: Rewrote each summary prompt to specify "5 to 6 sentences" and gave the model an explicit structure (sentence 1 = trend description, sentence 2 = peak explanation, sentence 3 = comparison, sentence 4 = inflection point, sentence 5-6 = takeaway). Also passed richer data — first-half vs second-half averages, peak contributors, percentage change — so the model had real material to work with. The summaries went from generic to specific and actually useful.
+
+---
+
+### Stage 9: r/worldpolitics & project framing
+
+While clicking through the  dashboard , I noticed something ,the r/worldpolitics is a 100% NSFW-flagged community whose top posts are mostly explicit images and off-topic content. The subreddit's name implies political discussion, but the actual data is the opposite — it's a textbook case of an unmoderated community drifting away from its original purpose. This raised two questions: how should the dashboard display this content, and is "Political Discourse Analysis Dashboard" still the right framing for the project?
+
+## Prompt 21
+**Component**: r/worldpolitics content handling (`backend/routes/overview.py`, `clusters.py`, `search.py`, `frontend/src/pages/Compare.jsx`, `Clusters.jsx`, `Search.jsx`, `README.md`)
+**Prompt**: "r/worldpolitics has NSFW posts in its top results across the dashboard. Should I filter `over_18 = 1` from displayed posts everywhere?"
+**Issue**: The first answer was to add blanket `AND over_18 = 0` filters across all four query paths and slap warning messages where posts disappeared. But hiding data from a research dashboard is editorializing — SimPPL's rubric explicitly mentions studying "actors and networks promoting... harassment" and the contrast between 9 moderated and 1 unmoderated political community is itself a finding worth surfacing, not something to censor.
+**Fix**: Reverted every backend filter. Added a single contextual one-line note that appears only where r/worldpolitics content actually surfaces (Compare top posts, Clusters expanded panel, Search results) explaining the community is unmoderated and posts are shown as-is. Documented the explicit decision in a "A Note on r/worldpolitics" section in the README so it's a defensible engineering choice in the interview rather than silent filtering. Show raw data, frame the unmoderation as an analytical observation.
+
