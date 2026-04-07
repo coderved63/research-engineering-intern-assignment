@@ -23,11 +23,11 @@ const SUBREDDIT_COLORS = {
 }
 
 const KEY_EVENTS = [
-  { date: '2024-W30', label: 'Biden drops out', color: '#3b82f6' },
-  { date: '2024-W45', label: 'Election Day', color: '#dc2626' },
-  { date: '2025-W01', label: 'Jan 6 Anniversary', color: '#f97316' },
-  { date: '2025-W03', label: 'Inauguration', color: '#7c3aed' },
-  { date: '2025-W06', label: 'Executive Orders Spike', color: '#dc2626' },
+  { date: '2024-30', label: 'Biden drops out', color: '#3b82f6' },
+  { date: '2024-45', label: 'Election Day', color: '#dc2626' },
+  { date: '2025-01', label: 'Jan 6 Anniversary', color: '#f97316' },
+  { date: '2025-03', label: 'Inauguration', color: '#7c3aed' },
+  { date: '2025-06', label: 'Executive Orders Spike', color: '#dc2626' },
 ]
 
 export default function Overview() {
@@ -35,6 +35,7 @@ export default function Overview() {
   const [timeline, setTimeline] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showEvents, setShowEvents] = useState(false)
 
   useEffect(() => {
     async function fetchData() {
@@ -163,10 +164,23 @@ export default function Overview() {
 
       {/* Timeline with Events */}
       <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm p-6 mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Activity Timeline</h2>
-        <p className="text-sm text-gray-500 mb-4">Weekly post volume with key political events marked</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={timeline}>
+        <div className="flex items-start justify-between mb-1 gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Activity Timeline</h2>
+            <p className="text-sm text-gray-500 mt-1">Weekly post volume across all 10 communities</p>
+          </div>
+          <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer select-none shrink-0 mt-1">
+            <input
+              type="checkbox"
+              checked={showEvents}
+              onChange={e => setShowEvents(e.target.checked)}
+              className="w-3.5 h-3.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+            />
+            Show key events
+          </label>
+        </div>
+        <ResponsiveContainer width="100%" height={showEvents ? 340 : 300}>
+          <AreaChart data={timeline} margin={{ top: showEvents ? 30 : 10, right: 20, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
@@ -177,9 +191,9 @@ export default function Overview() {
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip />
             <Area type="monotone" dataKey="count" stroke="#6366f1" fill="url(#colorCount)" strokeWidth={2} />
-            {KEY_EVENTS.map(evt => (
-              <ReferenceLine key={evt.date} x={evt.date} stroke={evt.color} strokeDasharray="3 3"
-                label={{ value: evt.label, position: 'top', fontSize: 10, fill: evt.color }} />
+            {showEvents && KEY_EVENTS.map(evt => (
+              <ReferenceLine key={evt.date} x={evt.date} stroke={evt.color} strokeDasharray="3 3" strokeWidth={1.5}
+                label={{ value: evt.label, position: 'top', fontSize: 11, fill: evt.color, fontWeight: 500 }} />
             ))}
           </AreaChart>
         </ResponsiveContainer>
