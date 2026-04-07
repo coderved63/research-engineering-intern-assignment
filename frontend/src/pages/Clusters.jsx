@@ -77,7 +77,7 @@ export default function Clusters() {
           <p className="text-xs text-gray-400">
             {clusters.length} clusters · {totalPosts.toLocaleString()} posts · KMeans on 384-dim embeddings
           </p>
-          <Link to="/embeddings" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+          <Link to="/dashboard/embeddings" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
             Explore full embedding map →
           </Link>
         </div>

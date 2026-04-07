@@ -1,12 +1,13 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
+import Logo from '../common/Logo'
 
 const navItems = [
-  { path: '/', label: 'Overview' },
-  { path: '/timeseries', label: 'Time Series' },
-  { path: '/network', label: 'Network' },
-  { path: '/clusters', label: 'Topics' },
-  { path: '/search', label: 'SearchAI' },
-  { path: '/embeddings', label: 'Embeddings' },
+  { path: '/dashboard', label: 'Overview' },
+  { path: '/dashboard/timeseries', label: 'Time Series' },
+  { path: '/dashboard/network', label: 'Network' },
+  { path: '/dashboard/clusters', label: 'Topics' },
+  { path: '/dashboard/search', label: 'SearchAI' },
+  { path: '/dashboard/embeddings', label: 'Embeddings' },
 ]
 
 export default function TopNavbar({ darkMode, setDarkMode }) {
@@ -17,10 +18,8 @@ export default function TopNavbar({ darkMode, setDarkMode }) {
         : 'bg-white/70 border-gray-200/50'
     }`}>
       <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-md">
-            <span className="text-white font-bold text-sm">T</span>
-          </div>
+        <Link to="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+          <Logo size={32} />
           <div>
             <h1 className={`text-base font-bold leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
               TheScope
@@ -29,14 +28,14 @@ export default function TopNavbar({ darkMode, setDarkMode }) {
               Political Discourse Analysis
             </p>
           </div>
-        </div>
+        </Link>
 
         <div className="flex items-center gap-1">
           {navItems.map(({ path, label }) => (
             <NavLink
               key={path}
               to={path}
-              end={path === '/'}
+              end={path === '/dashboard'}
               className={({ isActive }) =>
                 `px-3 py-1.5 text-sm rounded-lg transition-all ${
                   isActive
