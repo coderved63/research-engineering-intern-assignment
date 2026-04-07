@@ -14,7 +14,7 @@ export default function Sidebar() {
     <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
       <div className="p-6 border-b border-gray-700">
         <h1 className="text-lg font-bold tracking-tight">SimPPL Dashboard</h1>
-        <p className="text-xs text-gray-400 mt-1">Political Discourse Analysis</p>
+        <p className="text-xs text-gray-400 mt-1">Tracing Narratives Across Reddit</p>
       </div>
 
       <nav className="flex-1 py-4">

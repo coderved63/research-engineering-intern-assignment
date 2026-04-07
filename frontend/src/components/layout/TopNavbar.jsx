@@ -6,6 +6,7 @@ const navItems = [
   { path: '/dashboard/timeseries', label: 'Time Series' },
   { path: '/dashboard/network', label: 'Network' },
   { path: '/dashboard/clusters', label: 'Topics' },
+  { path: '/dashboard/compare', label: 'Compare' },
   { path: '/dashboard/search', label: 'SearchAI' },
   { path: '/dashboard/embeddings', label: 'Embeddings' },
 ]
@@ -25,7 +26,7 @@ export default function TopNavbar({ darkMode, setDarkMode }) {
               TheScope
             </h1>
             <p className={`text-[10px] leading-tight ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-              Political Discourse Analysis
+              Tracing Narratives Across Reddit
             </p>
           </div>
         </Link>

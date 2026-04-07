@@ -136,7 +136,7 @@ INSTRUCTIONS
 - Sentence 2: Pinpoint the peak moment and explain what subreddits drove it.
 - Sentence 3: Compare the most active and least active subreddits — what does this say about which communities dominated the conversation?
 - Sentence 4: Mention any clear inflection point (e.g. activity surge after January 20, 2025 inauguration).
-- Sentence 5-6: End with a takeaway — what does this trend reveal about political discourse during this period?
+- Sentence 5-6: End with a takeaway — what does this trend reveal about how these communities discussed events during this period?
 - Use ONLY the numbers provided above. Do not invent any numbers, dates, or subreddit names.
 - Do NOT start with "The chart shows" or "This data shows". State findings directly.
 - Be analytical, like a journalist writing for a non-technical audience."""
@@ -154,15 +154,15 @@ INSTRUCTIONS
         f"{', '.join([f'r/{s}' for s, _ in peak_contributors[:2]])}. "
         f"Across the entire period, r/{top_sub} dominated with {sub_totals.get(top_sub, 0):.0f} total, "
         f"while r/{bottom_3_subs[0][0]} contributed only {bottom_3_subs[0][1]:.0f}. "
-        f"This concentration suggests political conversation during this period was unevenly distributed across communities."
+        f"This concentration suggests conversation during this period was unevenly distributed across communities."
     )
 
 
 def generate_search_response(query, results, history=None):
     """Generate a conversational response for search results."""
     if not results:
-        prompt = f"""The user searched for "{query}" in a dataset of Reddit political posts, but no strong matches were found.
-Write a brief, helpful response (2 sentences max) acknowledging this and suggesting what they could try instead. Be specific to political discourse topics."""
+        prompt = f"""The user searched for "{query}" in a dataset of Reddit posts from 10 politically associated subreddits, but no strong matches were found.
+Write a brief, helpful response (2 sentences max) acknowledging this and suggesting what they could try instead. Be specific to political topics relevant to the 2024 US election and 2025 transition."""
 
         result = _call_llm(prompt, max_tokens=100)
         return result or f'No strong matches found for "{query}". Try searching for specific political topics like immigration, tariffs, or executive orders.'
@@ -177,9 +177,9 @@ Write a brief, helpful response (2 sentences max) acknowledging this and suggest
     for r in results[:10]:
         sub_counts[r['subreddit']] = sub_counts.get(r['subreddit'], 0) + 1
 
-    prompt = f"""You are an analyst for a political discourse research dashboard. The user searched for: "{query}"
+    prompt = f"""You are an analyst for a research dashboard tracing narratives across Reddit communities. The user searched for: "{query}"
 
-Here are the top 10 most relevant Reddit posts from a dataset of 8,799 posts across 10 political subreddits (July 2024 - Feb 2025):
+Here are the top 10 most relevant Reddit posts from a dataset of 8,799 posts across 10 subreddits (July 2024 - Feb 2025) collected for their political associations:
 
 {results_context}
 
@@ -221,7 +221,7 @@ def generate_follow_up_queries(query, results):
         for r in results[:5]
     ])
 
-    prompt = f"""The user searched for "{query}" in a Reddit political discourse dataset and got these top results:
+    prompt = f"""The user searched for "{query}" in a dataset of Reddit posts from 10 politically associated subreddits and got these top results:
 
 {results_context}
 
@@ -251,7 +251,7 @@ Return ONLY the 3 questions, one per line, no numbering or bullets."""
 
 def generate_overview_summary(stats):
     """Generate an executive summary for the overview page."""
-    prompt = f"""Write a plain-text executive summary (NO markdown, NO headers, NO #, NO bullet points) for a political discourse dashboard.
+    prompt = f"""Write a plain-text executive summary (NO markdown, NO headers, NO #, NO bullet points) for an investigative reporting dashboard tracing narratives across 10 Reddit communities collected for their political associations.
 
 Dataset: {stats['total_posts']} Reddit posts from {stats['total_authors']} authors
 Subreddits: {', '.join([f"r/{s['name']} ({s['count']})" for s in stats['subreddits']])}
@@ -262,10 +262,10 @@ Network: {stats['network_stats']['num_nodes']} connected authors, {stats['networ
 Write exactly 4 substantial paragraphs (3-4 sentences each), plain text only:
 
 Paragraph 1 — Setting the stage:
-Describe what this dataset captures and why the time period (July 2024 to February 2025) matters historically. Reference the 2024 US presidential election and the January 20, 2025 inauguration of Trump's second term. Mention the political diversity of the 10 subreddits.
+Describe what this dataset captures and why the time period (July 2024 to February 2025) matters historically. Reference the 2024 US presidential election and the January 20, 2025 inauguration of Trump's second term. Mention that the 10 subreddits were collected for their political associations and span the full political spectrum.
 
 Paragraph 2 — Volume and concentration:
-Explain that 83% of all activity (7,286 of 8,799 posts) is concentrated in January-February 2025, after the inauguration. Average daily posting jumped from ~13 posts/day to ~217 posts/day after January 20 — a 1,500% surge. Explain why this matters for political discourse.
+Explain that 83% of all activity (7,286 of 8,799 posts) is concentrated in January-February 2025, after the inauguration. Average daily posting jumped from ~13 posts/day to ~217 posts/day after January 20 — a 1,500% surge. Explain why this matters for tracing how narratives spread.
 
 Paragraph 3 — Media ecosystem fragmentation:
 Use the top news sources data to show how different subreddits share fundamentally different sources. For example, r/Conservative shares breitbart.com and foxnews.com, while r/politics shares nytimes.com and theguardian.com. Reference at least 4 specific domains by name with their share counts. This is a sign of isolated information ecosystems.
@@ -292,7 +292,7 @@ Do NOT use any markdown formatting. Do NOT start with "Executive Summary" or any
 
     return (
         f"This dataset captures {stats['total_posts']} posts from {stats['total_authors']} authors "
-        f"across 10 politically diverse subreddits, spanning {stats['date_range']['start']} to {stats['date_range']['end']}. "
+        f"across 10 subreddits collected for their political associations, spanning {stats['date_range']['start']} to {stats['date_range']['end']}. "
         f"The period covers the 2024 US presidential election through the first weeks of the new administration. "
         f"Top shared news sources include {', '.join([d['domain'] for d in stats['top_domains'][:3]])}."
     )
@@ -305,7 +305,7 @@ def generate_cluster_summary(clusters, k):
         for c in sorted(clusters, key=lambda x: -x['size'])[:10]
     ])
 
-    prompt = f"""Write a detailed plain-text analysis (NO markdown, NO headers, NO #) of these topic clusters from Reddit political discourse data (8,799 posts, 10 subreddits, July 2024 to February 2025, covering the 2024 US election and 2025 presidential transition).
+    prompt = f"""Write a detailed plain-text analysis (NO markdown, NO headers, NO #) of these topic clusters from a Reddit dataset (8,799 posts, 10 subreddits collected for their political associations, July 2024 to February 2025, covering the 2024 US election and 2025 presidential transition).
 
 {k} clusters were created using KMeans on 384-dimensional sentence embeddings. Here are the largest clusters:
 {cluster_desc}
@@ -313,9 +313,9 @@ def generate_cluster_summary(clusters, k):
 Write 5 to 6 sentences covering:
 1. What are the dominant themes that emerge across the largest clusters? Name at least 3 specific clusters by their keywords.
 2. Which clusters reflect election-period concerns (campaigns, voting, candidates) versus post-inauguration governance (executive orders, immigration, federal workforce)?
-3. Are there any surprising or unexpected clusters — small ones, or topics that wouldn't normally appear in political subreddits?
-4. What does the distribution of cluster sizes tell us — are a few topics dominating the conversation, or is discourse spread evenly across many topics?
-5. End with a takeaway about what Reddit's political discourse looked like during this seven-month window.
+3. Are there any surprising or unexpected clusters — small ones, or topics that wouldn't normally appear in politically associated subreddits?
+4. What does the distribution of cluster sizes tell us — are a few topics dominating the conversation, or is the conversation spread evenly across many topics?
+5. End with a takeaway about what these communities were discussing during this seven-month window.
 
 Use specific cluster keywords, exact post counts, and percentages where relevant. Do NOT use markdown, bullet points, or headers — write flowing analytical prose."""
 
@@ -336,7 +336,7 @@ def generate_network_summary(stats):
     density = stats.get('density', 'unknown')
     largest = stats.get('largest_component_size', 'unknown')
 
-    prompt = f"""Write a detailed plain-text analysis (NO markdown, NO headers, NO #) of this author interaction network built from Reddit political discourse data (8,799 posts, 10 subreddits, July 2024 to February 2025).
+    prompt = f"""Write a detailed plain-text analysis (NO markdown, NO headers, NO #) of this author interaction network built from a Reddit dataset (8,799 posts, 10 subreddits collected for their political associations, July 2024 to February 2025).
 
 The network is built from three signal types: crosspost links (weight 3.0), shared URL co-sharing (weight 2.0), and co-subreddit activity (weight 1.0). The [deleted] meta-author is excluded to prevent false super-connections.
 
@@ -349,7 +349,7 @@ Network density: {density}
 Largest connected component size: {largest}
 
 Write 5 to 6 sentences covering:
-1. What does {num_components} disconnected components in a {num_nodes}-node network reveal about how fragmented or unified the political discourse is on Reddit?
+1. What does {num_components} disconnected components in a {num_nodes}-node network reveal about how fragmented or unified author interaction is across these Reddit communities?
 2. What does the density of {density} tell us about how interconnected authors are in absolute terms? (Density of 1.0 would mean every author interacts with every other; density near 0 means very sparse interaction.)
 3. What do the {num_communities} Louvain communities suggest — are these likely subreddit-aligned communities or do they cross subreddit boundaries?
 4. The largest connected component contains {largest} authors. What does the gap between this and total nodes ({num_nodes}) say about the structure of cross-community interaction?
@@ -428,7 +428,7 @@ CONTEXT
 The visualization shows all 8,799 Reddit posts as dots on a 2D map. Posts that are semantically similar (discuss similar topics in similar ways) are placed near each other. Posts that are different are far apart. The map was created using all-MiniLM-L6-v2 sentence embeddings (384 dimensions per post) reduced to 2D using UMAP. Each post is colored by which subreddit it came from.
 
 DATASET
-{stats.get('total_posts', 8799)} posts across these 10 political subreddits: {subreddit_list}
+{stats.get('total_posts', 8799)} posts across these 10 subreddits collected for their political associations: {subreddit_list}
 Time period: July 2024 to February 2025 (covering the 2024 US election and 2025 Trump inauguration)
 
 WRITE 4 PARAGRAPHS
@@ -439,8 +439,8 @@ Explain that this is a "map of meaning" — each dot is a post, and dots near ea
 Paragraph 2 — How to read it:
 Explain that distinct clumps of dots are topic clusters that emerged automatically — no one labeled them, the AI just grouped posts that talked about similar things. Mention that the colors show which subreddit each post is from, so you can see whether different communities cluster separately or mix together. Tell the reader to look for: tight clumps (focused topics), sparse areas (unique posts), and surprising overlaps (posts from opposing political subreddits ending up near each other).
 
-Paragraph 3 — What this reveals about political discourse:
-Discuss what an embedding map of political Reddit discourse can reveal. For example: posts about Trump's executive orders form one neighborhood, posts about anarchist theory form another, posts about election results form yet another. Communities that share vocabulary will overlap in space, while ideologically distant ones stay apart. The biggest insight from this kind of visualization is finding "bridges" — posts where different political camps unexpectedly land near each other.
+Paragraph 3 — What this reveals about how the communities talk:
+Discuss what an embedding map of these Reddit communities can reveal. For example: posts about Trump's executive orders form one neighborhood, posts about anarchist theory form another, posts about election results form yet another. Communities that share vocabulary will overlap in space, while ideologically distant ones stay apart. The biggest insight from this kind of visualization is finding "bridges" — posts where different political camps unexpectedly land near each other.
 
 Paragraph 4 — How to use it:
 Tell the reader to use the search bar inside the map to find specific topics (e.g. searching "immigration" highlights all immigration-related posts). Encourage them to zoom into a clump to read individual post titles and see what defines that neighborhood.
@@ -457,7 +457,7 @@ Use plain conversational English a curious newspaper reader would understand. Do
 
 def answer_chart_question(question, data_context):
     """Answer a user's follow-up question about a specific chart's data."""
-    prompt = f"""You are analyzing a chart from a Reddit political discourse dashboard (8,799 posts from 10 subreddits, Jul 2024 - Feb 2025).
+    prompt = f"""You are analyzing a chart from a Reddit research dashboard (8,799 posts from 10 subreddits collected for their political associations, Jul 2024 - Feb 2025).
 
 Chart data and context:
 {data_context}

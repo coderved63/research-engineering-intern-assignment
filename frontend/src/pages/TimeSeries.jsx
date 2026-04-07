@@ -104,7 +104,7 @@ export default function TimeSeries() {
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Time Series Analysis</h1>
       <p className="text-gray-500 mb-6">
-        Track how political discourse evolves over time. Look for spikes that correlate with real-world events — when volume
+        Track how activity across the 10 communities in the dataset evolves over time. Look for spikes that correlate with real-world events — when volume
         increases for one subreddit but not others, it may indicate community-specific narratives.
       </p>
 

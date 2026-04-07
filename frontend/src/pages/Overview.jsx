@@ -72,15 +72,22 @@ export default function Overview() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-8 max-w-4xl">
         <h1 className="text-3xl font-bold text-gray-900">
-          Political Discourse on Reddit
+          Tracing Narratives Across Reddit Communities
         </h1>
-        <p className="text-gray-500 mt-2">
-          How do 10 politically diverse Reddit communities process the same political events — and who bridges the divides?
-          This dataset captures {stats.total_posts.toLocaleString()} posts from {stats.total_authors.toLocaleString()} authors
-          across the political spectrum (Jul 2024 — Feb 2025), covering the US election through the first weeks of the new administration.
-          83% of activity is concentrated in Jan-Feb 2025.
+        <p className="text-gray-500 mt-3 leading-relaxed">
+          How do politically distinct Reddit communities process the same events — and what does each one notice
+          that the others miss? This dashboard traces {stats.total_posts.toLocaleString()} posts from {stats.total_authors.toLocaleString()} authors
+          across 10 subreddits between July 2024 and February 2025 — a window that covers Biden dropping out,
+          the November election, and the first month of Trump's second term.
+        </p>
+        <p className="text-gray-500 mt-3 leading-relaxed">
+          The most striking pattern in the data is concentration: 83% of all activity falls into the six weeks
+          after January 20, when daily volume jumped from roughly 13 posts/day to 217 — a 1,500% surge that
+          turned the second half of the dataset into a near-real-time snapshot of the transition itself.
+          The pages below trace what each community noticed, which accounts bridged them, and how the topics
+          shifted week by week.
         </p>
       </div>
 
@@ -91,7 +98,7 @@ export default function Overview() {
         </summary>
         <div className="px-6 pb-6 text-gray-600 space-y-4 border-t border-gray-100 pt-5">
           <p className="text-sm leading-relaxed">
-            This dashboard investigates how political narratives spread across Reddit's ecosystem during the 2024 US election
+            This dashboard investigates how narratives spread across a curated set of Reddit communities during the 2024 US election
             and 2025 presidential transition. Inspired by SimPPL's Parrot platform, it combines <strong className="text-gray-800">linguistic analysis</strong> (NLP)
             with <strong className="text-gray-800">network analysis</strong> to trace how information flows between communities with different political orientations.
           </p>
@@ -99,10 +106,23 @@ export default function Overview() {
             <div className="bg-white/10 rounded-lg p-4 border border-gray-200/20">
               <h4 className="font-semibold text-gray-900 mb-2 text-sm">Data Source</h4>
               <p className="text-sm text-gray-600 leading-relaxed">
-                8,799 Reddit posts from 10 subreddits spanning the political spectrum: r/Anarchism, r/socialism, r/democrats,
-                r/Liberal, r/politics, r/PoliticalDiscussion, r/neoliberal, r/worldpolitics, r/Conservative, and r/Republican.
-                Each post includes title, body text, author, score, comments, and timestamps (July 23, 2024 — February 18, 2025).
+                8,799 Reddit posts from 10 subreddits collected for their political associations:
+                r/Anarchism, r/socialism, r/democrats, r/Liberal, r/politics, r/PoliticalDiscussion, r/neoliberal,
+                r/Conservative, r/Republican, and r/worldpolitics. Each post includes title, body text, author, score,
+                comments, and timestamps (July 23, 2024 — February 18, 2025).
               </p>
+              <div className="mt-3 bg-amber-50/70 border border-amber-200/70 rounded-lg px-3 py-2.5">
+                <div className="flex items-start gap-2">
+                  <div className="shrink-0 mt-0.5 w-4 h-4 rounded-full bg-amber-200/70 text-amber-800 flex items-center justify-center text-[10px] font-bold">!</div>
+                  <p className="text-xs text-amber-900/90 leading-relaxed">
+                    <strong className="font-semibold">Noted during the dataset audit:</strong> nine of the ten subreddits
+                    contain active political discussion, while r/worldpolitics has drifted into largely unmoderated,
+                    off-topic content (every post is flagged NSFW in the source data). It is kept in all analyses because
+                    removing it would change the network topology and weaken the comparison; individual r/worldpolitics
+                    posts are marked with a contextual note wherever they appear in the UI.
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="bg-white/10 rounded-lg p-4 border border-gray-200/20">
               <h4 className="font-semibold text-gray-900 mb-2 text-sm">NLP Pipeline</h4>

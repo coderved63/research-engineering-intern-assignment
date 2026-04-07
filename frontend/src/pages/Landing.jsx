@@ -149,7 +149,7 @@ export default function Landing() {
             <div className="text-amber-400 text-xs font-medium tracking-[0.2em] uppercase mb-4">What you can explore</div>
             <h2 className="text-4xl md:text-5xl font-bold leading-tight"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
-              Six lenses on political discourse
+              Six lenses on a single Reddit dataset
             </h2>
             <p className="text-gray-500 mt-4 text-base">
               Each section is built around a specific question — from how communities discussed events over time, to who bridges them, to how topics evolved.
@@ -228,7 +228,7 @@ export default function Landing() {
             Ready to investigate?
           </h3>
           <p className="text-gray-400 mb-8">
-            Step into the dashboard and start exploring political narratives.
+            Step into the dashboard and start tracing how narratives moved through Reddit.
           </p>
           <button onClick={() => navigate('/dashboard')}
             className="px-10 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-full shadow-2xl shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105 transition-all text-lg">

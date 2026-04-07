@@ -123,6 +123,12 @@ export default function Search() {
                     <p className="text-xs text-gray-500 font-medium mb-2">
                       Top {msg.results.length} results
                     </p>
+                    {msg.results.some(r => r.subreddit === 'worldpolitics') && (
+                      <p className="text-[11px] text-amber-700/90 bg-amber-50/60 border border-amber-200/60 rounded px-2.5 py-1.5 mb-3 italic leading-snug">
+                        Some results are from r/worldpolitics, a largely unmoderated community that has
+                        drifted away from political discussion. Posts are shown as-is from the source data.
+                      </p>
+                    )}
                     <div className="space-y-2">
                       {msg.results.slice(0, 10).map((r, j) => (
                         <a key={r.id} href={r.permalink ? `https://reddit.com${r.permalink}` : '#'}
@@ -187,7 +193,7 @@ export default function Search() {
           type="text"
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="Ask anything about political discourse on Reddit..."
+          placeholder="Ask anything about Reddit's political communities..."
           className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           disabled={loading}
         />

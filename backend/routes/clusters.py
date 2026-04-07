@@ -50,7 +50,8 @@ def get_clusters():
                 placeholders = ','.join(['?' for _ in all_pids])
                 top = conn.execute(f"""
                     SELECT id, title, subreddit, score, author, permalink, created_date FROM posts
-                    WHERE id IN ({placeholders}) ORDER BY score DESC LIMIT 10
+                    WHERE id IN ({placeholders})
+                    ORDER BY score DESC LIMIT 10
                 """, all_pids).fetchall()
                 clusters[cid]['top_posts'] = [
                     {'id': t[0], 'title': t[1], 'subreddit': t[2], 'score': t[3],
@@ -110,11 +111,12 @@ def get_clusters():
                 label = f"Cluster {i}"
 
         cluster_post_ids = [post_ids[j] for j in range(len(labels)) if labels[j] == i]
-        pids_sample = cluster_post_ids[:5]
+        pids_sample = cluster_post_ids[:10]
         placeholders = ','.join(['?' for _ in pids_sample])
         top = conn.execute(f"""
             SELECT id, title, subreddit, score FROM posts
-            WHERE id IN ({placeholders}) ORDER BY score DESC
+            WHERE id IN ({placeholders})
+            ORDER BY score DESC LIMIT 5
         """, pids_sample).fetchall()
 
         clusters[i] = {

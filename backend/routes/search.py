@@ -39,7 +39,7 @@ def search():
     query_lower = query.lower().strip('?!. ')
     if query_lower in greetings:
         return jsonify({
-            'answer': 'Hey! I can help you explore a dataset of 8,799 Reddit posts from 10 political subreddits (July 2024 - Feb 2025). Ask me anything about political discourse, media sharing, or community behavior.',
+            'answer': 'Hey! I can help you explore a dataset of 8,799 Reddit posts from 10 subreddits (July 2024 - Feb 2025). Ask me anything about how these communities discussed events, what news they shared, or how they overlap.',
             'results': [],
             'follow_up_queries': [
                 'What topics dominated after the inauguration?',

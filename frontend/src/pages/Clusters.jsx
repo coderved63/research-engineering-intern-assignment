@@ -197,6 +197,12 @@ export default function Clusters() {
                         </a>
                       ))}
                     </div>
+                    {(cluster.top_posts || []).some(p => p.subreddit === 'worldpolitics') && (
+                      <p className="text-[10px] text-amber-700/80 mt-2 italic leading-snug">
+                        Note: this cluster includes posts from r/worldpolitics, a largely unmoderated
+                        community that has drifted away from political discussion. Posts are shown as-is.
+                      </p>
+                    )}
                   </div>
                 </div>
 
