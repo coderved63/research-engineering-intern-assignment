@@ -47,4 +47,8 @@ export const generateSummary = (data) =>
 export const getOverviewStats = () =>
   api.get('/overview/stats')
 
+// Embeddings summary
+export const getEmbeddingsSummary = () =>
+  api.get('/embeddings/summary')
+
 export default api

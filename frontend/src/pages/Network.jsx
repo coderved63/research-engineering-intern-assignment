@@ -144,14 +144,15 @@ export default function Network() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Network Analysis</h1>
-      <p className="text-gray-500 mb-2">
-        This network maps author interactions through crossposts, shared URLs, and co-subreddit activity.
-        Node size reflects PageRank (influence), color indicates Louvain community detection.
-        Removing a highly-connected node tests whether one account holds the network together.
+      <p className="text-gray-500 mb-3 max-w-3xl">
+        Each dot is a Reddit author. Two authors are connected if they interact —
+        by sharing the same news link, posting in the same communities, or one crossposting from the other.
+        Bigger dots are more influential (they sit on more pathways through the network).
+        Colors group authors who tend to cluster together. Click any author to see who they connect to,
+        or remove them to see if the network falls apart without them.
       </p>
-      <p className="text-xs text-gray-400 mb-6">
-        3 edge types: crosspost links (base weight 3.0), shared URL co-sharing (base weight 2.0), co-subreddit activity (base weight 1.0). Weights accumulate for repeated interactions. [deleted] accounts excluded to prevent false super-connectors.
-      </p>
+
+      <p className="text-xs text-gray-400 mb-6 font-medium">How the network is built</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Graph */}

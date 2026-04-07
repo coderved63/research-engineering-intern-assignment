@@ -8,13 +8,20 @@ export default function AISummary({ text }) {
     .replace(/^\s*[-*]\s/gm, '• ')    // convert list markers to bullets
     .trim()
 
+  // Split into paragraphs by blank lines
+  const paragraphs = cleanText.split(/\n\s*\n/).filter(p => p.trim())
+
   return (
-    <div className="mt-3 bg-indigo-50/70 backdrop-blur-sm border border-indigo-100/50 rounded-xl px-4 py-3">
-      <div className="flex items-start gap-2">
-        <span className="text-xs bg-indigo-200/80 text-indigo-800 px-1.5 py-0.5 rounded-md font-medium shrink-0 mt-0.5">
+    <div className="mt-4 bg-indigo-50/70 backdrop-blur-sm border border-indigo-100/50 rounded-xl px-5 py-4">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-xs bg-indigo-200/80 text-indigo-800 px-2 py-0.5 rounded-md font-semibold tracking-wide">
           AI Summary
         </span>
-        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{cleanText}</div>
+      </div>
+      <div className="space-y-3">
+        {paragraphs.map((para, i) => (
+          <p key={i} className="text-sm text-gray-700 leading-relaxed">{para}</p>
+        ))}
       </div>
     </div>
   )

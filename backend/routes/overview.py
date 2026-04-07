@@ -63,3 +63,24 @@ def get_stats():
     stats['executive_summary'] = generate_overview_summary(stats)
 
     return jsonify(stats)
+
+
+@overview_bp.route('/embeddings/summary')
+def embeddings_summary():
+    """Return an AI-generated explanation of the embedding visualization."""
+    conn = sqlite3.connect(current_app.config['db_path'])
+    total_posts = conn.execute("SELECT COUNT(*) FROM posts").fetchone()[0]
+    subreddit_counts = conn.execute(
+        "SELECT subreddit, COUNT(*) as count FROM posts GROUP BY subreddit ORDER BY count DESC"
+    ).fetchall()
+    conn.close()
+
+    stats = {
+        'total_posts': total_posts,
+        'subreddits': [{'name': s[0], 'count': s[1]} for s in subreddit_counts],
+    }
+
+    from services.llm_service import generate_embeddings_summary
+    summary = generate_embeddings_summary(stats)
+
+    return jsonify({'summary': summary})

@@ -67,12 +67,16 @@ def generate_timeseries_summary(series_data, metric, granularity, subreddits=Non
     # Aggregate totals per period
     period_totals = {}
     sub_totals = {}
+    sub_period_totals = {}  # {sub: {period: count}}
     for item in series_data:
         date = item.get('date', '')
         count = item.get('count', item.get('avg', 0))
         sub = item.get('subreddit', '')
         period_totals[date] = period_totals.get(date, 0) + count
         sub_totals[sub] = sub_totals.get(sub, 0) + count
+        if sub not in sub_period_totals:
+            sub_period_totals[sub] = {}
+        sub_period_totals[sub][date] = sub_period_totals[sub].get(date, 0) + count
 
     periods = sorted(period_totals.keys())
     if not periods:
@@ -84,38 +88,73 @@ def generate_timeseries_summary(series_data, metric, granularity, subreddits=Non
     lowest_val = period_totals[lowest_period]
     top_sub = max(sub_totals, key=sub_totals.get) if sub_totals else "N/A"
     top_3_subs = sorted(sub_totals.items(), key=lambda x: -x[1])[:3]
+    bottom_3_subs = sorted(sub_totals.items(), key=lambda x: x[1])[:3]
 
-    prompt = f"""Write a 2-3 sentence plain-language summary explaining this chart to someone who cannot read charts. They should understand the key trend just by reading your summary.
+    # Compute first half vs second half average
+    mid = len(periods) // 2
+    first_half_avg = sum(period_totals[p] for p in periods[:mid]) / max(mid, 1)
+    second_half_avg = sum(period_totals[p] for p in periods[mid:]) / max(len(periods) - mid, 1)
+    pct_change = ((second_half_avg - first_half_avg) / max(first_half_avg, 1)) * 100
 
-IMPORTANT: The dataset covers Reddit posts from July 2024 to February 2025 ONLY. Do NOT mention any dates outside this range.
+    # Find which subreddit had the biggest spike near the peak
+    peak_contributors = sorted(
+        [(s, sub_period_totals[s].get(peak_period, 0)) for s in sub_period_totals],
+        key=lambda x: -x[1]
+    )[:3]
 
+    total_volume = sum(period_totals.values())
+    avg_per_period = total_volume / max(len(periods), 1)
+
+    prompt = f"""Write a detailed 5-6 sentence plain-language summary explaining this time-series chart to someone who cannot read charts. The reader should understand the trend, the key shifts, who drove the activity, and what the data reveals — purely from your summary.
+
+IMPORTANT: The dataset covers Reddit posts from July 2024 to February 2025 ONLY. Do NOT mention any dates outside this range. Trump's inauguration was on January 20, 2025.
+
+CHART CONTEXT
 What the chart shows: {metric} per {granularity}, {sub_filter}
 Period covered: {periods[0]} to {periods[-1]}
 Number of {granularity}s shown: {len(periods)}
+Total volume across the entire period: {total_volume:.0f}
+Average per {granularity}: {avg_per_period:.1f}
+
+KEY POINTS
 Lowest point: {lowest_period} with {lowest_val:.0f}
 Highest point: {peak_period} with {peak_val:.0f}
-Top 3 subreddits by volume: {', '.join([f'r/{s} ({v:.0f})' for s, v in top_3_subs])}
 Starting value: {period_totals.get(periods[0], 0):.0f}
 Ending value: {period_totals.get(periods[-1], 0):.0f}
+First half average: {first_half_avg:.1f}
+Second half average: {second_half_avg:.1f}
+Change between halves: {pct_change:+.0f}%
 
-Rules:
-- State findings directly, do NOT say "the chart shows" or "the data shows"
-- Use ONLY the numbers provided above — do not invent or hallucinate any numbers
-- Explain what happened in simple terms a journalist could use
-- Mention at least one specific subreddit name and one specific number"""
+SUBREDDIT BREAKDOWN
+Top 3 subreddits by total volume: {', '.join([f'r/{s} ({v:.0f})' for s, v in top_3_subs])}
+Bottom 3 subreddits: {', '.join([f'r/{s} ({v:.0f})' for s, v in bottom_3_subs])}
+Top 3 subreddits driving the peak at {peak_period}: {', '.join([f'r/{s} ({v:.0f})' for s, v in peak_contributors])}
 
-    result = _call_llm(prompt, max_tokens=200)
+INSTRUCTIONS
+- Write 5 to 6 sentences, in plain English, no markdown, no bullet points.
+- Sentence 1: Describe the overall shape of the trend (was it flat, growing, falling, spiky?) and the magnitude of change between halves.
+- Sentence 2: Pinpoint the peak moment and explain what subreddits drove it.
+- Sentence 3: Compare the most active and least active subreddits — what does this say about which communities dominated the conversation?
+- Sentence 4: Mention any clear inflection point (e.g. activity surge after January 20, 2025 inauguration).
+- Sentence 5-6: End with a takeaway — what does this trend reveal about political discourse during this period?
+- Use ONLY the numbers provided above. Do not invent any numbers, dates, or subreddit names.
+- Do NOT start with "The chart shows" or "This data shows". State findings directly.
+- Be analytical, like a journalist writing for a non-technical audience."""
+
+    result = _call_llm(prompt, max_tokens=500)
     if result:
         return result
 
-    # Fallback: rule-based summary
-    change_pct = ((period_totals.get(periods[-1], 0) - period_totals.get(periods[0], 1)) / max(period_totals.get(periods[0], 1), 1)) * 100
-    direction = "increased" if change_pct > 0 else "decreased"
+    # Fallback: richer rule-based summary
+    direction = "rose sharply" if pct_change > 30 else "declined" if pct_change < -30 else "stayed relatively stable"
     return (
-        f"Activity {direction} from {period_totals.get(periods[0], 0):.0f} to {period_totals.get(periods[-1], 0):.0f} "
-        f"over the period ({periods[0]} to {periods[-1]}). "
-        f"The peak occurred at {peak_period} with {peak_val:.0f} {metric}. "
-        f"r/{top_sub} was the most active subreddit with {sub_totals.get(top_sub, 0):.0f} total."
+        f"Activity {direction} over the {len(periods)} {granularity}s shown, with the average shifting from "
+        f"{first_half_avg:.0f} in the first half to {second_half_avg:.0f} in the second half ({pct_change:+.0f}%). "
+        f"The peak occurred at {peak_period} with {peak_val:.0f} — driven primarily by "
+        f"{', '.join([f'r/{s}' for s, _ in peak_contributors[:2]])}. "
+        f"Across the entire period, r/{top_sub} dominated with {sub_totals.get(top_sub, 0):.0f} total, "
+        f"while r/{bottom_3_subs[0][0]} contributed only {bottom_3_subs[0][1]:.0f}. "
+        f"This concentration suggests political conversation during this period was unevenly distributed across communities."
     )
 
 
@@ -146,9 +185,16 @@ Here are the top 10 most relevant Reddit posts from a dataset of 8,799 posts acr
 
 Subreddit distribution in results: {sub_counts}
 
-Write a 2-3 sentence analytical response summarizing what the data shows about "{query}". Be specific — mention subreddit names, post counts, and any patterns you notice (e.g., which communities discuss this topic most, what framing they use). Do NOT just list the results."""
+Write a detailed 4-5 sentence analytical response answering the user's query based on this data. Structure it like this:
+- Open with a direct answer to "{query}" based on what the results show
+- Describe which communities are most engaged with this topic and how the distribution skews
+- Highlight one or two specific posts that best illustrate the finding (cite post titles)
+- Note any contrast or pattern across communities (e.g., "left-leaning subs frame it differently from right-leaning")
+- End with a takeaway or what's notable about this finding
 
-    result = _call_llm(prompt, max_tokens=250)
+Use ONLY the data above. Be specific with subreddit names, post titles, and counts. Do NOT use markdown headers or bullet points — write flowing prose."""
+
+    result = _call_llm(prompt, max_tokens=450)
     if result:
         return result
 
@@ -205,22 +251,31 @@ Return ONLY the 3 questions, one per line, no numbering or bullets."""
 
 def generate_overview_summary(stats):
     """Generate an executive summary for the overview page."""
-    prompt = f"""Write a plain-text summary (NO markdown, NO headers, NO #, NO bullet points with *) for a political discourse dashboard.
+    prompt = f"""Write a plain-text executive summary (NO markdown, NO headers, NO #, NO bullet points) for a political discourse dashboard.
 
 Dataset: {stats['total_posts']} Reddit posts from {stats['total_authors']} authors
 Subreddits: {', '.join([f"r/{s['name']} ({s['count']})" for s in stats['subreddits']])}
 Date range: {stats['date_range']['start']} to {stats['date_range']['end']}
-Top news sources: {', '.join([f"{d['domain']} ({d['count']} shares)" for d in stats['top_domains'][:5]])}
-Network: {stats['network_stats']['num_nodes']} connected authors, {stats['network_stats']['num_components']} separate components
+Top news sources: {', '.join([f"{d['domain']} ({d['count']} shares)" for d in stats['top_domains'][:8]])}
+Network: {stats['network_stats']['num_nodes']} connected authors, {stats['network_stats']['num_edges']} edges, {stats['network_stats']['num_components']} separate components
 
-Write exactly 3 short paragraphs, plain text only:
-1. What this dataset is and why the time period matters (2024 election + 2025 transition)
-2. One specific insight: which communities share which news sources (give exact names and numbers)
-3. One specific insight: what the fragmented network (72 components) tells us about cross-community dialogue
+Write exactly 4 substantial paragraphs (3-4 sentences each), plain text only:
 
-Do NOT use any markdown formatting. Do NOT start with "Executive Summary" or any title. Just write the paragraphs directly."""
+Paragraph 1 — Setting the stage:
+Describe what this dataset captures and why the time period (July 2024 to February 2025) matters historically. Reference the 2024 US presidential election and the January 20, 2025 inauguration of Trump's second term. Mention the political diversity of the 10 subreddits.
 
-    result = _call_llm(prompt, max_tokens=300)
+Paragraph 2 — Volume and concentration:
+Explain that 83% of all activity (7,286 of 8,799 posts) is concentrated in January-February 2025, after the inauguration. Average daily posting jumped from ~13 posts/day to ~217 posts/day after January 20 — a 1,500% surge. Explain why this matters for political discourse.
+
+Paragraph 3 — Media ecosystem fragmentation:
+Use the top news sources data to show how different subreddits share fundamentally different sources. For example, r/Conservative shares breitbart.com and foxnews.com, while r/politics shares nytimes.com and theguardian.com. Reference at least 4 specific domains by name with their share counts. This is a sign of isolated information ecosystems.
+
+Paragraph 4 — Network structure:
+Explain what {stats['network_stats']['num_components']} disconnected components in a {stats['network_stats']['num_nodes']}-node network reveals about cross-community dialogue. Most communities operate in isolation, but ~87 cross-community authors act as bridges. Comment on what this fragmentation means for the spread of narratives.
+
+Do NOT use any markdown formatting. Do NOT start with "Executive Summary" or any title. Write each paragraph as a standalone block separated by a blank line."""
+
+    result = _call_llm(prompt, max_tokens=700)
     if result:
         # Strip any markdown the LLM might still add
         cleaned = result.strip()
@@ -250,14 +305,21 @@ def generate_cluster_summary(clusters, k):
         for c in sorted(clusters, key=lambda x: -x['size'])[:10]
     ])
 
-    prompt = f"""Write a plain-text summary (NO markdown, NO headers, NO #) analyzing these topic clusters from Reddit political discourse data (8,799 posts, 10 subreddits, Jul 2024 - Feb 2025).
+    prompt = f"""Write a detailed plain-text analysis (NO markdown, NO headers, NO #) of these topic clusters from Reddit political discourse data (8,799 posts, 10 subreddits, July 2024 to February 2025, covering the 2024 US election and 2025 presidential transition).
 
-{k} clusters were created using KMeans. Here are the largest ones:
+{k} clusters were created using KMeans on 384-dimensional sentence embeddings. Here are the largest clusters:
 {cluster_desc}
 
-Write 2-3 sentences explaining: what are the dominant topics, which topics overlap or are surprising, and what this tells us about what Reddit was discussing during this period. Use specific cluster names and numbers. Do NOT use markdown formatting."""
+Write 5 to 6 sentences covering:
+1. What are the dominant themes that emerge across the largest clusters? Name at least 3 specific clusters by their keywords.
+2. Which clusters reflect election-period concerns (campaigns, voting, candidates) versus post-inauguration governance (executive orders, immigration, federal workforce)?
+3. Are there any surprising or unexpected clusters — small ones, or topics that wouldn't normally appear in political subreddits?
+4. What does the distribution of cluster sizes tell us — are a few topics dominating the conversation, or is discourse spread evenly across many topics?
+5. End with a takeaway about what Reddit's political discourse looked like during this seven-month window.
 
-    result = _call_llm(prompt, max_tokens=200)
+Use specific cluster keywords, exact post counts, and percentages where relevant. Do NOT use markdown, bullet points, or headers — write flowing analytical prose."""
+
+    result = _call_llm(prompt, max_tokens=500)
     if result:
         import re
         cleaned = re.sub(r'^#{1,4}\s+.*$', '', result, flags=re.MULTILINE).strip()
@@ -267,14 +329,72 @@ Write 2-3 sentences explaining: what are the dominant topics, which topics overl
 
 def generate_network_summary(stats):
     """Generate a summary of the network analysis."""
-    prompt = f"""Write a plain-text summary (NO markdown, NO headers, NO #) analyzing this author interaction network from Reddit political discourse data.
+    num_nodes = stats.get('num_nodes', 0)
+    num_edges = stats.get('num_edges', 0)
+    num_components = stats.get('num_components', 0)
+    num_communities = stats.get('num_communities', 'unknown')
+    density = stats.get('density', 'unknown')
+    largest = stats.get('largest_component_size', 'unknown')
 
-Network stats: {stats['num_nodes']} connected authors, {stats['num_edges']} edges, {stats['num_components']} disconnected components, {stats.get('num_communities', 'unknown')} communities detected.
-Density: {stats.get('density', 'unknown')}
+    prompt = f"""Write a detailed plain-text analysis (NO markdown, NO headers, NO #) of this author interaction network built from Reddit political discourse data (8,799 posts, 10 subreddits, July 2024 to February 2025).
 
-Write 2-3 sentences explaining: what does the high number of components mean (fragmentation), what does the density tell us about how connected authors are, and what this implies about cross-community interaction on Reddit. Use specific numbers. Do NOT use markdown formatting."""
+The network is built from three signal types: crosspost links (weight 3.0), shared URL co-sharing (weight 2.0), and co-subreddit activity (weight 1.0). The [deleted] meta-author is excluded to prevent false super-connections.
 
-    result = _call_llm(prompt, max_tokens=200)
+NETWORK STATS
+Total connected authors (nodes): {num_nodes}
+Total interaction edges: {num_edges}
+Disconnected components: {num_components}
+Communities detected (Louvain algorithm): {num_communities}
+Network density: {density}
+Largest connected component size: {largest}
+
+Write 5 to 6 sentences covering:
+1. What does {num_components} disconnected components in a {num_nodes}-node network reveal about how fragmented or unified the political discourse is on Reddit?
+2. What does the density of {density} tell us about how interconnected authors are in absolute terms? (Density of 1.0 would mean every author interacts with every other; density near 0 means very sparse interaction.)
+3. What do the {num_communities} Louvain communities suggest — are these likely subreddit-aligned communities or do they cross subreddit boundaries?
+4. The largest connected component contains {largest} authors. What does the gap between this and total nodes ({num_nodes}) say about the structure of cross-community interaction?
+5. End with a takeaway: what does this network structure imply about the spread of narratives between politically diverse Reddit communities?
+
+Use specific numbers throughout. Do NOT use markdown, bullet points, or headers — write flowing analytical prose."""
+
+    result = _call_llm(prompt, max_tokens=500)
+    if result:
+        import re
+        cleaned = re.sub(r'^#{1,4}\s+.*$', '', result, flags=re.MULTILINE).strip()
+        return cleaned.replace('**', '')
+    return None
+
+
+def generate_embeddings_summary(stats):
+    """Generate a plain-language summary explaining what the embedding visualization shows."""
+    subreddit_list = ', '.join([f"r/{s['name']} ({s['count']})" for s in stats.get('subreddits', [])[:10]])
+
+    prompt = f"""Write a plain-text 4-paragraph explanation (NO markdown, NO headers, NO #) helping a non-technical reader understand what they are looking at in an interactive embedding visualization.
+
+CONTEXT
+The visualization shows all 8,799 Reddit posts as dots on a 2D map. Posts that are semantically similar (discuss similar topics in similar ways) are placed near each other. Posts that are different are far apart. The map was created using all-MiniLM-L6-v2 sentence embeddings (384 dimensions per post) reduced to 2D using UMAP. Each post is colored by which subreddit it came from.
+
+DATASET
+{stats.get('total_posts', 8799)} posts across these 10 political subreddits: {subreddit_list}
+Time period: July 2024 to February 2025 (covering the 2024 US election and 2025 Trump inauguration)
+
+WRITE 4 PARAGRAPHS
+
+Paragraph 1 — What you're looking at:
+Explain that this is a "map of meaning" — each dot is a post, and dots near each other talk about similar things. Don't use jargon like "embedding space" or "vector dimensions." Use the metaphor of a city map where similar buildings (posts) cluster into neighborhoods (topics).
+
+Paragraph 2 — How to read it:
+Explain that distinct clumps of dots are topic clusters that emerged automatically — no one labeled them, the AI just grouped posts that talked about similar things. Mention that the colors show which subreddit each post is from, so you can see whether different communities cluster separately or mix together. Tell the reader to look for: tight clumps (focused topics), sparse areas (unique posts), and surprising overlaps (posts from opposing political subreddits ending up near each other).
+
+Paragraph 3 — What this reveals about political discourse:
+Discuss what an embedding map of political Reddit discourse can reveal. For example: posts about Trump's executive orders form one neighborhood, posts about anarchist theory form another, posts about election results form yet another. Communities that share vocabulary will overlap in space, while ideologically distant ones stay apart. The biggest insight from this kind of visualization is finding "bridges" — posts where different political camps unexpectedly land near each other.
+
+Paragraph 4 — How to use it:
+Tell the reader to use the search bar inside the map to find specific topics (e.g. searching "immigration" highlights all immigration-related posts). Encourage them to zoom into a clump to read individual post titles and see what defines that neighborhood.
+
+Use plain conversational English a curious newspaper reader would understand. Do NOT use markdown."""
+
+    result = _call_llm(prompt, max_tokens=700)
     if result:
         import re
         cleaned = re.sub(r'^#{1,4}\s+.*$', '', result, flags=re.MULTILINE).strip()
