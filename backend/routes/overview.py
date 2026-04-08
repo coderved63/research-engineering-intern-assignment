@@ -73,6 +73,12 @@ def _get_subreddit_stats(conn, subreddit):
         GROUP BY week ORDER BY week
     """, (subreddit,)).fetchall()
 
+    # Date range for this subreddit — important because the dataset has uneven
+    # time coverage across subreddits (some span 7 months, some span 1 week)
+    date_range = conn.execute("""
+        SELECT MIN(created_date), MAX(created_date) FROM posts WHERE subreddit = ?
+    """, (subreddit,)).fetchone()
+
     return {
         'name': subreddit,
         'total_posts': counts[0],
@@ -81,6 +87,10 @@ def _get_subreddit_stats(conn, subreddit):
         'avg_comments': round(counts[3], 1) if counts[3] else 0,
         'max_score': counts[4] or 0,
         'total_score': counts[5] or 0,
+        'date_range': {
+            'start': date_range[0] if date_range and date_range[0] else None,
+            'end': date_range[1] if date_range and date_range[1] else None,
+        },
         'top_domains': [{'domain': d[0], 'count': d[1]} for d in top_domains],
         'top_authors': [
             {'author': a[0], 'count': a[1], 'avg_score': round(a[2], 1) if a[2] else 0}

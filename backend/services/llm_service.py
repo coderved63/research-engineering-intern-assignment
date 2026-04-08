@@ -262,10 +262,10 @@ Network: {stats['network_stats']['num_nodes']} connected authors, {stats['networ
 Write exactly 4 substantial paragraphs (3-4 sentences each), plain text only:
 
 Paragraph 1 — Setting the stage:
-Describe what this dataset captures and why the time period (July 2024 to February 2025) matters historically. Reference the 2024 US presidential election and the January 20, 2025 inauguration of Trump's second term. Mention that the 10 subreddits were collected for their political associations and span the full political spectrum.
+Describe what this dataset captures and why the time period (July 2024 to February 2025) matters historically. Reference the 2024 US presidential election and the January 20, 2025 inauguration of Trump's second term. Mention that the 10 subreddits were collected for their political associations and span the full political spectrum. Flag the important methodological constraint: the dataset has uneven time coverage — only r/Liberal covers all 7 months, while several subreddits are only sampled over the final weeks.
 
-Paragraph 2 — Volume and concentration:
-Explain that 83% of all activity (7,286 of 8,799 posts) is concentrated in January-February 2025, after the inauguration. Average daily posting jumped from ~13 posts/day to ~217 posts/day after January 20 — a 1,500% surge. Explain why this matters for tracing how narratives spread.
+Paragraph 2 — The uneven inauguration surge:
+Explain that within r/Liberal (the one subreddit with full pre-and-post inauguration data), daily posting rose 247% after January 20, 2025 — from 3.5 posts/day to 12 posts/day. r/Anarchism saw a smaller 71% bump, while r/socialism stayed essentially flat and r/worldpolitics actually declined. The reaction to the new administration was concentrated in liberal/mainstream-left communities, not uniform across the political spectrum. This is the most analytically interesting time-based finding in the dataset.
 
 Paragraph 3 — Media ecosystem fragmentation:
 Use the top news sources data to show how different subreddits share fundamentally different sources. For example, r/Conservative shares breitbart.com and foxnews.com, while r/politics shares nytimes.com and theguardian.com. Reference at least 4 specific domains by name with their share counts. This is a sign of isolated information ecosystems.

@@ -84,11 +84,11 @@ export default function Overview() {
           the November election, and the first month of Trump's second term.
         </p>
         <p className="text-gray-500 mt-3 leading-relaxed">
-          The most striking pattern in the data is concentration: 83% of all activity falls into the six weeks
-          after January 20, when daily volume jumped from roughly 13 posts/day to 217 — a 1,500% surge that
-          turned the second half of the dataset into a near-real-time snapshot of the transition itself.
-          The pages below trace what each community noticed, which accounts bridged them, and how the topics
-          shifted week by week.
+          An important note up front: the dataset has uneven time coverage. r/Liberal spans the full 7 months;
+          r/worldpolitics, r/Anarchism, and r/socialism each cover a few months; the other six subreddits are
+          only sampled over the final weeks of the window. Any time-based claim in this dashboard is scoped to
+          the subreddits whose data window actually supports it. The pages below trace what each community
+          noticed, which accounts bridged them, and how the topics shifted.
         </p>
       </div>
 
@@ -212,11 +212,12 @@ export default function Overview() {
             </p>
           </div>
           <div className="bg-white/60 rounded-lg p-3">
-            <p className="text-sm font-medium text-gray-900 mb-1">Massive Spike After Inauguration</p>
+            <p className="text-sm font-medium text-gray-900 mb-1">Inauguration Surge Was Uneven</p>
             <p className="text-xs text-gray-500">
-              After Trump's inauguration on January 20, 2025, average daily posting jumped from 13 posts/day to 217 posts/day —
-              a 1,500% increase. This was driven by reactions to executive orders on immigration, DOGE, and federal workforce changes
-              across all 10 communities simultaneously.
+              Of the four subreddits with real pre-inauguration data, only r/Liberal saw a dramatic surge —
+              from 3.5 to 12 posts/day, a 247% jump. r/Anarchism bumped 71%, while r/socialism stayed flat
+              and r/worldpolitics actually declined. The post-inauguration reaction was concentrated in
+              liberal/mainstream-left communities, not uniformly across the political spectrum.
             </p>
           </div>
           <div className="bg-white/60 rounded-lg p-3">
@@ -231,7 +232,7 @@ export default function Overview() {
           <div className="bg-white/60 rounded-lg p-3">
             <p className="text-sm font-medium text-gray-900 mb-1">Some Accounts Post at Unusual Rates</p>
             <p className="text-xs text-gray-500">
-              The user M_i_c_K posted 246 times across r/Conservative and r/Republican in just 26 days — that's over 9 posts per day.
+              The user M_i_c_K posted 246 times across r/Conservative and r/Republican in under 4 weeks — that's over 9 posts per day.
               While this doesn't prove automation, this posting frequency is far above normal human behavior and
               warrants investigation for potential coordinated or bot-assisted activity.
             </p>

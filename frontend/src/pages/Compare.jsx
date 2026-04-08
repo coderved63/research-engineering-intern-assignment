@@ -18,8 +18,8 @@ const SUB_COLORS = {
 }
 
 export default function Compare() {
-  const [sub1, setSub1] = useState('Conservative')
-  const [sub2, setSub2] = useState('socialism')
+  const [sub1, setSub1] = useState('Liberal')
+  const [sub2, setSub2] = useState('Anarchism')
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -112,7 +112,20 @@ export default function Compare() {
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: SUB_COLORS[sub.name] }} />
                     <h2 className="text-xl font-bold text-gray-900">r/{sub.name}</h2>
                   </div>
-                  <p className="text-xs text-gray-500">{sub.unique_authors} unique authors</p>
+                  <p className="text-xs text-gray-500">
+                    {sub.unique_authors} unique authors
+                    {sub.date_range && sub.date_range.start && sub.date_range.end && (() => {
+                      const start = new Date(sub.date_range.start)
+                      const end = new Date(sub.date_range.end)
+                      const days = Math.round((end - start) / 86400000) + 1
+                      const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      return (
+                        <span className="block mt-1 text-[10px] text-gray-400 italic">
+                          Data window: {fmt(start)} – {fmt(end)} ({days} day{days === 1 ? '' : 's'})
+                        </span>
+                      )
+                    })()}
+                  </p>
                 </div>
 
                 {/* Metrics */}

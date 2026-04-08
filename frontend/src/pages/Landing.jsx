@@ -129,7 +129,7 @@ export default function Landing() {
           {[
             { value: '8,799', label: 'Reddit Posts', sublabel: 'analyzed semantically' },
             { value: '10', label: 'Subreddits', sublabel: 'across the spectrum' },
-            { value: '1,500%', label: 'Activity Surge', sublabel: 'after inauguration' },
+            { value: '3,599', label: 'Unique Authors', sublabel: '87 cross-community' },
             { value: '320', label: 'Network Nodes', sublabel: '773 interaction edges' },
           ].map((stat, i) => (
             <div key={i} className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-amber-500/30 hover:bg-white/[0.05] transition-all">
@@ -149,7 +149,7 @@ export default function Landing() {
             <div className="text-amber-400 text-xs font-medium tracking-[0.2em] uppercase mb-4">What you can explore</div>
             <h2 className="text-4xl md:text-5xl font-bold leading-tight"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
-              Six lenses on a single Reddit dataset
+              Six lenses on Reddit data
             </h2>
             <p className="text-gray-500 mt-4 text-base">
               Each section is built around a specific question — from how communities discussed events over time, to who bridges them, to how topics evolved.
@@ -175,18 +175,18 @@ export default function Landing() {
               },
               {
                 number: '04',
+                title: 'Compare Communities',
+                desc: 'Side-by-side analytical comparison of any two subreddits. News sources, top topics, top authors, and an AI-generated journalist-ready takeaway.',
+              },
+              {
+                number: '05',
                 title: 'SearchAI',
                 desc: 'Semantic search ranked by meaning, not keywords. Handles non-English queries through detection and translation.',
               },
               {
-                number: '05',
+                number: '06',
                 title: 'Embedding Map',
                 desc: 'Interactive 2D projection of all 8,799 posts via UMAP. Zoom, pan, and search to discover topic neighborhoods.',
-              },
-              {
-                number: '06',
-                title: 'Investigative Story',
-                desc: 'Methodology, verified key findings, and an event-annotated timeline. Designed like a research report, not a chart wall.',
               },
             ].map((feature) => (
               <div key={feature.number}

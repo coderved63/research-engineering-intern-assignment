@@ -15,9 +15,10 @@ The research question: **How do politically diverse communities process the same
 ### Key Findings from the Data
 
 - **87 bridge accounts** post in 2+ subreddits — potential cross-community influence nodes
-- **1,500% activity surge** after inauguration (Jan 20, 2025) — avg posts/day jumped from 13 to 217
+- **Uneven inauguration surge**: within r/Liberal (the only subreddit with full 7-month coverage), daily posting rose 247% after Jan 20, 2025 (3.5 → 12 posts/day). r/Anarchism bumped 71%; r/socialism and r/worldpolitics were flat or declining. The reaction was concentrated in liberal/mainstream-left communities, not spread across the political spectrum
 - **Media fragmentation**: r/Conservative shares breitbart.com (#1), r/politics shares nytimes.com (#1) — isolated information ecosystems
-- **High-velocity accounts**: M_i_c_K posted 246 times in 26 days (9+/day) — potential automated behavior
+- **High-velocity accounts**: M_i_c_K posted 246 times in under 4 weeks (9+/day) — potential automated behavior
+- **Uneven sampling**: only r/Liberal covers the full 7-month window. r/worldpolitics, r/Anarchism, r/socialism cover partial months. The other six subreddits are sampled over the final weeks. Any time-based claim is scoped accordingly
 
 ---
 
