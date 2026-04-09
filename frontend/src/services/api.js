@@ -32,8 +32,8 @@ export const searchTimeSeries = (data) =>
 export const getNetworkGraph = (params) =>
   api.get('/network/graph', { params })
 
-export const removeNetworkNode = (author) =>
-  api.get(`/network/remove-node/${encodeURIComponent(author)}`)
+export const removeNetworkNode = (author, params = {}) =>
+  api.get(`/network/remove-node/${encodeURIComponent(author)}`, { params })
 
 // Clusters
 export const getClusters = (params) =>

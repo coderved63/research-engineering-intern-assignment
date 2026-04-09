@@ -13,7 +13,7 @@ const COMMUNITY_COLORS = [
 export default function Network() {
   const [graphData, setGraphData] = useState(null)
   const [stats, setStats] = useState(null)
-  const [minDegree, setMinDegree] = useState(2)
+  const [minDegree, setMinDegree] = useState(1)
   const [selectedNode, setSelectedNode] = useState(null)
   const [removalImpact, setRemovalImpact] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -95,7 +95,7 @@ export default function Network() {
     if (!selectedNode) return
     setRemoving(true)
     try {
-      const res = await removeNetworkNode(selectedNode.id)
+      const res = await removeNetworkNode(selectedNode.id, { min_degree: minDegree })
       setRemovalImpact(res.data)
     } catch (err) {
       console.error(err)

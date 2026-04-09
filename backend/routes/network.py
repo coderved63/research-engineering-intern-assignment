@@ -42,16 +42,20 @@ def get_graph():
     nodes_to_keep = [n for n in G.nodes() if G.degree(n) >= min_degree]
     subgraph = G.subgraph(nodes_to_keep).copy()
 
+    from services.llm_service import generate_network_summary
+
     edge_key = 'links'
+    filtered_stats = {
+        'num_nodes': subgraph.number_of_nodes(),
+        'num_edges': subgraph.number_of_edges(),
+        'num_components': nx.number_connected_components(subgraph),
+        'density': round(nx.density(subgraph), 6) if subgraph.number_of_nodes() > 1 else 0
+    }
     result = {
         'nodes': [{'id': n, **subgraph.nodes[n]} for n in subgraph.nodes()],
         edge_key: [{'source': u, 'target': v, **d} for u, v, d in subgraph.edges(data=True)],
-        'stats': {
-            'num_nodes': subgraph.number_of_nodes(),
-            'num_edges': subgraph.number_of_edges(),
-            'num_components': nx.number_connected_components(subgraph),
-            'density': round(nx.density(subgraph), 6) if subgraph.number_of_nodes() > 1 else 0
-        }
+        'stats': filtered_stats,
+        'summary': generate_network_summary(filtered_stats),
     }
 
     return jsonify(result)
@@ -59,25 +63,34 @@ def get_graph():
 
 @network_bp.route('/remove-node/<author>')
 def remove_node(author):
+    min_degree = request.args.get('min_degree', 1, type=int)
     graph_data = current_app.config['graph_data']
-    G = graph_from_data(graph_data)
+    G_full = graph_from_data(graph_data)
 
-    if author not in G:
+    if author not in G_full:
         return jsonify({
             'error': True,
             'message': f'Author "{author}" not found in the network.'
         }), 404
 
-    # Stats before removal
+    # Apply the same min_degree filter the graph view is using
+    if min_degree > 1:
+        nodes_to_keep = [n for n in G_full.nodes() if G_full.degree(n) >= min_degree]
+        G = G_full.subgraph(nodes_to_keep).copy()
+    else:
+        G = G_full.copy()
+
+    # If the author was filtered out by min_degree, they're not in the visible graph
+    if author not in G:
+        return jsonify({
+            'error': True,
+            'message': f'Author "{author}" is not visible at min degree {min_degree}.'
+        }), 404
+
+    # Stats before removal (within the filtered graph)
     components_before = nx.number_connected_components(G)
     nodes_before = G.number_of_nodes()
     edges_before = G.number_of_edges()
-
-    # Find which component the author belongs to
-    for comp in nx.connected_components(G):
-        if author in comp:
-            original_component_size = len(comp)
-            break
 
     # Remove the node
     removed_degree = G.degree(author)
@@ -105,7 +118,7 @@ def remove_node(author):
             f"Components: {components_after}. {edges_before - edges_after} edges removed."
         )
 
-    # Return updated graph
+    # Return updated graph (respecting min_degree filter)
     edge_key = 'links'
     result = {
         'nodes': [{'id': n, **G.nodes[n]} for n in G.nodes()],
