@@ -23,7 +23,7 @@ def detect_language(text):
 def search():
     data = request.get_json() or {}
     query = data.get('message', '').strip()
-    limit = data.get('limit', 20)
+    limit = data.get('limit', 10)
 
     # Edge case: conversational/greeting queries
     greetings = [
