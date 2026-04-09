@@ -20,6 +20,9 @@ const SUBREDDIT_COLORS = {
   neoliberal: '#6366f1', worldpolitics: '#14b8a6', Conservative: '#f97316', Republican: '#ea580c'
 }
 
+// Pre-computed k values load instantly from SQLite; other k values are computed on the fly
+const PRECOMPUTED_K = new Set([3, 5, 8, 10, 15, 20, 30, 50])
+
 export default function Clusters() {
   const [k, setK] = useState(8)
   const [debouncedK, setDebouncedK] = useState(8)
@@ -71,11 +74,20 @@ export default function Clusters() {
             onChange={e => setK(Number(e.target.value))}
             className="flex-1 max-w-xs" />
           <span className="text-2xl font-bold text-indigo-600 w-12 text-center">{k}</span>
+          {PRECOMPUTED_K.has(k) ? (
+            <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+              Instant · pre-computed
+            </span>
+          ) : (
+            <span className="text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+              Computed on-the-fly
+            </span>
+          )}
         </div>
         {warning && <p className="text-sm text-amber-600 mt-2">{warning}</p>}
         <div className="flex items-center justify-between mt-3">
           <p className="text-xs text-gray-400">
-            {clusters.length} clusters · {totalPosts.toLocaleString()} posts · KMeans on 384-dim embeddings
+            {clusters.length} clusters · {totalPosts.toLocaleString()} posts · KMeans on 384-dim embeddings · Instant for k ∈ {'{'}3, 5, 8, 10, 15, 20, 30, 50{'}'}
           </p>
           <Link to="/dashboard/embeddings" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
             Explore full embedding map →

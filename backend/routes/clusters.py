@@ -93,7 +93,7 @@ def get_clusters():
     # Get texts for labeling
     texts = [r[0] for r in conn.execute("SELECT combined_text FROM posts ORDER BY rowid").fetchall()]
 
-    # Generate labels
+    # Generate labels and gather full per-cluster data
     clusters = {}
     for i in range(k):
         cluster_texts = [t for t, l in zip(texts, labels) if l == i]
@@ -111,26 +111,47 @@ def get_clusters():
                 label = f"Cluster {i}"
 
         cluster_post_ids = [post_ids[j] for j in range(len(labels)) if labels[j] == i]
-        pids_sample = cluster_post_ids[:10]
-        placeholders = ','.join(['?' for _ in pids_sample])
-        top = conn.execute(f"""
-            SELECT id, title, subreddit, score FROM posts
-            WHERE id IN ({placeholders})
-            ORDER BY score DESC LIMIT 5
-        """, pids_sample).fetchall()
 
-        clusters[i] = {
+        cluster_data = {
             'id': i,
             'label': label,
             'size': len(cluster_post_ids),
-            'top_posts': [{'id': t[0], 'title': t[1], 'subreddit': t[2], 'score': t[3]} for t in top]
+            'top_posts': [],
+            'subreddits': [],
         }
+
+        # Top 10 posts by score and subreddit breakdown
+        if cluster_post_ids:
+            placeholders = ','.join(['?' for _ in cluster_post_ids])
+
+            top = conn.execute(f"""
+                SELECT id, title, subreddit, score, author, permalink, created_date FROM posts
+                WHERE id IN ({placeholders})
+                ORDER BY score DESC LIMIT 10
+            """, cluster_post_ids).fetchall()
+            cluster_data['top_posts'] = [
+                {'id': t[0], 'title': t[1], 'subreddit': t[2], 'score': t[3],
+                 'author': t[4], 'permalink': t[5], 'date': t[6]} for t in top
+            ]
+
+            sub_counts = conn.execute(f"""
+                SELECT subreddit, COUNT(*) as count FROM posts
+                WHERE id IN ({placeholders}) GROUP BY subreddit ORDER BY count DESC
+            """, cluster_post_ids).fetchall()
+            cluster_data['subreddits'] = [{'name': s[0], 'count': s[1]} for s in sub_counts]
+
+        clusters[i] = cluster_data
 
     conn.close()
 
+    cluster_list = list(clusters.values())
+    from services.llm_service import generate_cluster_summary
+    summary = generate_cluster_summary(cluster_list, k)
+
     result = {
-        'clusters': list(clusters.values()),
+        'clusters': cluster_list,
         'k': k,
+        'summary': summary,
     }
     if was_clamped:
         result['warning'] = f'Requested k={original_k} was clamped to {k} (valid range: {MIN_K}-{MAX_K})'
