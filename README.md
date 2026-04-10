@@ -4,6 +4,10 @@ A full-stack investigative reporting dashboard analyzing how a curated set of Re
 
 **Live Demo**: [https://huggingface.co/spaces/mv63/thescope-dashboard](https://huggingface.co/spaces/mv63/thescope-dashboard)
 
+**Video Walkthrough**: [https://youtu.be/LwfLngDz7yg](https://youtu.be/LwfLngDz7yg)
+
+**AI Prompts Log**: [vedant-prompts.md](vedant-prompts.md) — 22 numbered prompts documenting every AI-assisted component, what went wrong, and how it was fixed.
+
 ---
 
 ## What This Project Does
@@ -26,7 +30,7 @@ The research question: **How do politically diverse communities process the same
 
 ### 1. Overview Page
 - Key metrics (posts, authors, date range, network stats)
-- Activity timeline with real political events annotated (Biden drops out, Election Day, Inauguration, Executive Orders spike)
+- Activity timeline with toggleable political event annotations (Biden drops out, Election Day, Jan 6 Anniversary, Inauguration, Executive Orders spike)
 - Subreddit distribution and top news sources shared
 - Collapsible methodology section explaining data pipeline, NLP approach, network construction, and AI integration
 - AI-generated executive summary
@@ -44,7 +48,8 @@ The research question: **How do politically diverse communities process the same
 - [deleted] accounts excluded to prevent false super-connectors
 - Click any node to inspect PageRank, betweenness, community, subreddits
 - **Node removal simulation**: remove an account and see how the network fragments (e.g., removing John3262005 splits the network from 72 to 83 components)
-- Min-degree filter slider
+- Min-degree filter slider to simplify the view (default: show all nodes; slide up to focus on high-connectivity core)
+- Node removal simulation respects the current filter level
 - AI-generated network summary
 
 ### 4. Topic Clusters
@@ -53,14 +58,15 @@ The research question: **How do politically diverse communities process the same
 - Donut chart showing cluster proportions (clickable to expand)
 - Expandable cluster detail: subreddit breakdown + top 10 posts with Reddit links
 - Handles extreme k values gracefully (clamped with warning)
+- Pre-computed k values load instantly; on-the-fly k values compute in ~1 second with full subreddit breakdown and AI summary
 - AI-generated cluster summary
 
 ### 5. Compare Communities
 - Side-by-side comparison of any two subreddits in the dataset
-- Each side shows: total posts, unique authors, average score and comments, top 10 news domains, top 5 discussion topics, top 10 most active authors (clickable to Reddit), top 5 highest-scoring posts
+- Each side shows: total posts, unique authors, average score and comments, data window (date range badge), top 10 news domains, top 5 discussion topics, top 10 most active authors (clickable to Reddit), top 5 highest-scoring posts
 - Overlapping line chart showing both communities' weekly post volume on the same axes
 - AI-generated 4-paragraph analytical comparison covering engagement, information ecosystems, topical focus, and a journalist-ready takeaway
-- Default comparison: r/Conservative vs r/socialism (maximum political contrast)
+- Default comparison: r/Liberal vs r/Anarchism (both have multi-month coverage for a fair comparison)
 
 ### 6. SearchAI (Semantic Search Chatbot)
 - Results ranked by semantic similarity, not keyword matching
@@ -75,6 +81,34 @@ The research question: **How do politically diverse communities process the same
 - Zoom, pan, and search within the embedding space
 - Posts near each other discuss similar themes
 - AI-generated 4-paragraph explanation of how to read the embedding map (for non-technical users)
+
+---
+
+## Screenshots
+
+### Landing Page
+![Landing page](docs/screenshots/landing.png)
+
+### Overview — Activity Timeline + Key Findings
+![Overview page](docs/screenshots/overview.png)
+
+### Time Series — Post Volume, Engagement, and Topic Trends
+![Time Series page](docs/screenshots/timeseries.png)
+
+### Network Analysis — Force-Directed Graph with Node Inspection
+![Network page](docs/screenshots/network.png)
+
+### Topic Clusters — KMeans with Tunable k
+![Topics page](docs/screenshots/topics.png)
+
+### Compare Communities — Side-by-Side Subreddit Comparison
+![Compare page](docs/screenshots/compare.png)
+
+### SearchAI — Semantic Search with Zero-Keyword-Overlap Result
+![Search page](docs/screenshots/search.png)
+
+### Embedding Explorer — Datamapplot 2D Visualization
+![Embeddings page](docs/screenshots/embeddings.png)
 
 ---
 
@@ -118,8 +152,8 @@ The rubric requires queries with zero keyword overlap returning correct results.
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
-| Backend | Flask (Python) | Lightweight, matches job requirements |
-| Frontend | React.js (Vite) + Tailwind CSS | Modern, fast builds, matches job requirements |
+| Backend | Flask (Python) | Lightweight, well-suited for API-first architecture |
+| Frontend | React.js (Vite) + Tailwind CSS | Modern, fast builds, full control over UX |
 | Database | SQLite | Scale-appropriate for 8.8K rows, ships as single file |
 | Charts | Recharts | React-native, clean time-series support |
 | Network Viz | react-force-graph-2d | WebGL-backed, handles hundreds of nodes |
@@ -257,7 +291,7 @@ User types "immigration policy"
     ├─ 2. Detect language → "en" (if non-English → translate via LLM)
     ├─ 3. Embed query with all-MiniLM-L6-v2 → 384-dim vector (~5ms)
     ├─ 4. Cosine similarity: query × 8,799 embeddings (<10ms)
-    ├─ 5. Rank by similarity, take top 20
+    ├─ 5. Rank by similarity, take top 10
     ├─ 6. Fetch post details from SQLite
     ├─ 7. LLM generates conversational answer (~3-5s)
     └─ 8. Return: answer + results + follow-up suggestions + time-series
