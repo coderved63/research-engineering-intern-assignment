@@ -2,7 +2,7 @@
 
 A full-stack investigative reporting dashboard analyzing how a curated set of Reddit communities discussed the 2024 US election and 2025 transition of power. Nine of the ten subreddits are explicitly political; the tenth (r/worldpolitics) is included as a documented case of unmoderated community drift.
 
-**Live Demo**: [https://huggingface.co/spaces/mv63/thescope-dashboard](https://huggingface.co/spaces/mv63/thescope-dashboard)
+**Live Demo**: [https://mv63-thescope-dashboard.hf.space/)
 
 **Video Walkthrough**: [https://youtu.be/LwfLngDz7yg](https://youtu.be/LwfLngDz7yg)
 
